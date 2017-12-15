@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
 /*
@@ -32,7 +33,7 @@ public class FileManager {
 
     public FileManager() {
         fields = new ArrayList<>();
-        records  = new ArrayList<>();
+        records = new ArrayList<>();
     }
 
     //Crea un nuevo archivo con el nombre.
@@ -93,17 +94,33 @@ public class FileManager {
         recordPerLine = 0;
         System.gc();
     }
-    
-    public void loadFile(String pathname) throws FileNotFoundException{
-        this.file = new File(pathname+".txt");
+
+    public void loadFile(String pathname) throws FileNotFoundException, IOException {
+        this.file = new File(pathname + ".txt");
         //Cargar metadata
-        File file = new File("META"+pathname+".txt");
-        fr = new FileReader(file);
+        //File file = new File("META"+pathname+".txt");
+        fr = new FileReader(this.file);
         buff_reader = new BufferedReader(fr);
-        if(file.exists()){
-            
+        if (file.exists()) {
+            char[] buff = new char[36];
+            byte[] bytes = new byte[100];
+
+            RandomAccessFile file = new RandomAccessFile(pathname + ".txt", "r");
+            file.read();
+            buff_reader.read(buff);
+            for (int j = 0; j < 5; j++) {
+                for (int i = 0; i < buff.length; i++) {
+                    //    System.out.println(bytes[i]);
+
+                    System.out.print(buff[i]);
+                }
+                System.out.println("");
+                buff_reader.skip(36);
+                buff_reader.read(buff);
+            }
+
         }
-    
+
     }
 
     public void saveFile(ArrayList<Record> records) {
@@ -119,10 +136,11 @@ public class FileManager {
             int offset = 0;
             if (availList_offset == -1) {
                 offset = this.offset_final;
+                
                 for (int i = 0; i < records.size(); i++) {
 
-                    aux += "|" + Integer.toString(offset);
-
+                    aux += "|";
+                        
                     for (int j = 0; j < records.get(i).getField().size(); j++) {
 
                         aux += ":" + records.get(i).getField().get(j);
@@ -156,7 +174,7 @@ public class FileManager {
                 buff_writer = new BufferedWriter(fw);
                 for (FieldDefinition field : fields) {
                     aux += field.getName() + ":";
-                    aux += field.getSize() + ":";
+                    //aux += field.getSize() + ":";
                     aux += field.getType() + ":";
                     aux += field.isKey() + "|";
                 }

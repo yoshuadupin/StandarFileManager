@@ -1,4 +1,4 @@
-|Ciudad:20:char:true|Edad:20:int:false|Nombre:20:char:false|Apellido:20:char:false|Carrera:20:char:false|
+|Ciudad:char:true|Edad:int:false|Nombre:char:false|Apellido:char:false|Carrera:char:false|
 -1
-409253
-50
+3500
+100

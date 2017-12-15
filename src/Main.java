@@ -1,4 +1,5 @@
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /*
@@ -15,7 +16,7 @@ public class Main {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // TODO code application logic here
         FileManager file = new FileManager();
         ArrayList<FieldDefinition> fields = new ArrayList<>();
@@ -39,14 +40,14 @@ public class Main {
         field.add(aux4);
         field.add(aux5);
         System.out.println(field);
-        for (int i = 0; i < 10050; i++) {
+        for (int i = 0; i < 100; i++) {
             records.add(new Record(5, field));
         }
         
         if (file.newFile("Archivo", fields)) {
             System.out.println("Escribio en el archivo");
             file.saveFile(records);
-            file.closeFile();
+            file.loadFile("Archivo");
         }
     }
 
