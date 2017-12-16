@@ -5,7 +5,6 @@ public class FieldDefinition {
     private boolean key;
 
     public FieldDefinition(String name, String type, int size, boolean key) {
-        
         this.name = name;
         this.type = type;
         this.size = size;

@@ -40,11 +40,13 @@ public class Principal extends javax.swing.JFrame {
         jt_fields = new javax.swing.JTable();
         jf_record = new javax.swing.JFrame();
         jTabbedPane2 = new javax.swing.JTabbedPane();
-        jp_add = new javax.swing.JPanel();
+        jp_fields = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         cb_fields = new javax.swing.JComboBox<>();
+        jb_addformtable = new javax.swing.JButton();
         jb_addrecord = new javax.swing.JButton();
+        jp_add = new javax.swing.JPanel();
         jp_modify = new javax.swing.JPanel();
         jp_find = new javax.swing.JPanel();
         jp_list = new javax.swing.JPanel();
@@ -243,45 +245,68 @@ public class Principal extends javax.swing.JFrame {
 
         jLabel6.setText("Campos");
 
-        jb_addrecord.setText("Agregar");
+        jb_addformtable.setText("Agregar Campo");
+        jb_addformtable.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jb_addformtableActionPerformed(evt);
+            }
+        });
+
+        jb_addrecord.setText("Agregar Registro");
         jb_addrecord.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jb_addrecordActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout jp_addLayout = new javax.swing.GroupLayout(jp_add);
-        jp_add.setLayout(jp_addLayout);
-        jp_addLayout.setHorizontalGroup(
-            jp_addLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jp_addLayout.createSequentialGroup()
+        javax.swing.GroupLayout jp_fieldsLayout = new javax.swing.GroupLayout(jp_fields);
+        jp_fields.setLayout(jp_fieldsLayout);
+        jp_fieldsLayout.setHorizontalGroup(
+            jp_fieldsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jp_fieldsLayout.createSequentialGroup()
                 .addContainerGap(176, Short.MAX_VALUE)
-                .addGroup(jp_addLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jp_addLayout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addGap(165, 165, 165))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jp_addLayout.createSequentialGroup()
-                        .addComponent(jb_addrecord)
-                        .addGap(173, 173, 173))))
-            .addGroup(jp_addLayout.createSequentialGroup()
+                .addComponent(jLabel5)
+                .addGap(165, 165, 165))
+            .addGroup(jp_fieldsLayout.createSequentialGroup()
                 .addGap(37, 37, 37)
                 .addComponent(jLabel6)
                 .addGap(18, 18, 18)
                 .addComponent(cb_fields, javax.swing.GroupLayout.PREFERRED_SIZE, 293, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(jp_fieldsLayout.createSequentialGroup()
+                .addGap(75, 75, 75)
+                .addComponent(jb_addformtable)
+                .addGap(55, 55, 55)
+                .addComponent(jb_addrecord)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        jp_addLayout.setVerticalGroup(
-            jp_addLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jp_addLayout.createSequentialGroup()
+        jp_fieldsLayout.setVerticalGroup(
+            jp_fieldsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jp_fieldsLayout.createSequentialGroup()
                 .addGap(57, 57, 57)
                 .addComponent(jLabel5)
                 .addGap(55, 55, 55)
-                .addGroup(jp_addLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jp_fieldsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
                     .addComponent(cb_fields, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(54, 54, 54)
-                .addComponent(jb_addrecord)
-                .addContainerGap(103, Short.MAX_VALUE))
+                .addGap(67, 67, 67)
+                .addGroup(jp_fieldsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jb_addformtable)
+                    .addComponent(jb_addrecord))
+                .addContainerGap(90, Short.MAX_VALUE))
+        );
+
+        jTabbedPane2.addTab("Campos", jp_fields);
+
+        javax.swing.GroupLayout jp_addLayout = new javax.swing.GroupLayout(jp_add);
+        jp_add.setLayout(jp_addLayout);
+        jp_addLayout.setHorizontalGroup(
+            jp_addLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 435, Short.MAX_VALUE)
+        );
+        jp_addLayout.setVerticalGroup(
+            jp_addLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 341, Short.MAX_VALUE)
         );
 
         jTabbedPane2.addTab("Agregar", jp_add);
@@ -683,33 +708,41 @@ public class Principal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_mi_modifyfieldActionPerformed
 
-    private void jb_addrecordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_addrecordActionPerformed
+    private void jb_addformtableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_addformtableActionPerformed
         DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
         DefaultComboBoxModel comboBoxModel = (DefaultComboBoxModel) cb_fields.getModel();
         String columnName = ((FieldDefinition) comboBoxModel.getSelectedItem()).getName();
-
-        String value = JOptionPane.showInputDialog("Ingrese " + columnName.toLowerCase() + " del nuevo registro");
+        boolean exists = false;
+        FieldDefinition field = (FieldDefinition) comboBoxModel.getSelectedItem();
 
         if (tableModel.getColumnCount() == 0) {
-            tableModel.addColumn(((FieldDefinition) comboBoxModel.getSelectedItem()).getName());
-            Object[] newRow = new Object[]{value};
-            tableModel.addRow(newRow);
+            tableModel.addColumn(field.getName());
         } else {
             for (int i = 0; i < tableModel.getColumnCount(); i++) {
                 if (columnName.equals(tableModel.getColumnName(i))) {
-                    Object[] newRow = new Object[]{value};
-                    tableModel.addRow(newRow);
-                } else {
-                    tableModel.addColumn(((FieldDefinition) comboBoxModel.getSelectedItem()).getName());
-                    tableModel.setValueAt(value, 0, 1);
-                    //Object[] newRow = new Object[]{value};
-                    //tableModel.addRow(newRow);
-                    System.out.println("LOL");
+                    JOptionPane.showMessageDialog(this, "¡Este campo ya existe!");
+                    exists = true;
+                    break;
                 }
             }
-        }
 
-        JOptionPane.showMessageDialog(this, "¡Registro agregado exitosamente!");
+            if (!exists) {
+                tableModel.addColumn(((FieldDefinition) comboBoxModel.getSelectedItem()).getName());
+                recordFields.add(field);
+                JOptionPane.showMessageDialog(this, "¡Campo agregado exitosamente a la tabla!");
+                recordFields.add(field);
+            }
+        }
+    }//GEN-LAST:event_jb_addformtableActionPerformed
+
+    private void jb_addrecordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_addrecordActionPerformed
+        DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
+
+        for (FieldDefinition field : recordFields) {
+            String value = JOptionPane.showInputDialog("Ingrese " + field.getName().toLowerCase() + ": ");
+            Object[] newRow = new Object[]{value};
+            tableModel.addRow(newRow);
+        }
     }//GEN-LAST:event_jb_addrecordActionPerformed
 
     /**
@@ -765,6 +798,7 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JTabbedPane jTabbedPane3;
     private javax.swing.JButton jb_addfield;
+    private javax.swing.JButton jb_addformtable;
     private javax.swing.JButton jb_addrecord;
     private javax.swing.JButton jb_deleterecord;
     private javax.swing.JFrame jf_field;
@@ -776,6 +810,7 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JMenu jm_standarization;
     private javax.swing.JPanel jp_add;
     private javax.swing.JPanel jp_createindex;
+    private javax.swing.JPanel jp_fields;
     private javax.swing.JPanel jp_file;
     private javax.swing.JPanel jp_find;
     private javax.swing.JPanel jp_list;
@@ -800,6 +835,8 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JTextField tf_fieldtype;
     // End of variables declaration//GEN-END:variables
     ArrayList<FieldDefinition> fields = new ArrayList();
+    ArrayList<FieldDefinition> recordFields = new ArrayList();
     ArrayList<Record> records = new ArrayList();
     FileManager fileManager = new FileManager();
+    int FIELDS = 0;
 }
