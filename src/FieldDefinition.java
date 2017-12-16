@@ -1,13 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author Diego
- */
 public class FieldDefinition {
     private String name ;
     private String type = null;
@@ -53,8 +43,9 @@ public class FieldDefinition {
     public void setKey(boolean key) {
         this.key = key;
     }
-    
-    
-    
-    
+
+    @Override
+    public String toString() {
+        return "Nombre: " + name + ", Tipo: " + type + ", Tamaño: " + size + ", ¿Es llave?: " + key;
+    }
 }

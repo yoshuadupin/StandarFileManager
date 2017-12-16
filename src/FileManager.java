@@ -9,15 +9,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- *
- * @author Diego
- */
 public class FileManager {
 
     private File file = null;
@@ -41,20 +32,24 @@ public class FileManager {
         File file = new File("META" + pathname + ".txt");
         this.file = new File(pathname + ".txt");
         this.fields = fields;
+        
         try {
             if (file.exists()) {
                 file.delete();
             }
+            
             if (file.createNewFile()) {
                 String aux = "|";
                 fw = new FileWriter(file);
                 buff_writer = new BufferedWriter(fw);
+
                 for (FieldDefinition field : fields) {
                     aux += field.getName() + ":";
                     aux += field.getSize() + ":";
                     aux += field.getType() + ":";
                     aux += field.isKey() + "|";
                 }
+
                 //Escribe metadata para campos
                 buff_writer.write(aux);
                 buff_writer.newLine();
@@ -72,7 +67,6 @@ public class FileManager {
                 buff_writer.close();
 
                 return true;
-
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -108,6 +102,7 @@ public class FileManager {
             RandomAccessFile file = new RandomAccessFile(pathname + ".txt", "r");
             file.read();
             buff_reader.read(buff);
+
             for (int j = 0; j < 5; j++) {
                 for (int i = 0; i < buff.length; i++) {
                     //    System.out.println(bytes[i]);
@@ -118,9 +113,7 @@ public class FileManager {
                 buff_reader.skip(36);
                 buff_reader.read(buff);
             }
-
         }
-
     }
 
     public void saveFile(ArrayList<Record> records) {
@@ -136,18 +129,17 @@ public class FileManager {
             int offset = 0;
             if (availList_offset == -1) {
                 offset = this.offset_final;
-                
+
                 for (int i = 0; i < records.size(); i++) {
-
                     aux += "|";
-                        
-                    for (int j = 0; j < records.get(i).getField().size(); j++) {
 
+                    for (int j = 0; j < records.get(i).getField().size(); j++) {
                         aux += ":" + records.get(i).getField().get(j);
                         offset += aux.length() - offset;
-
                     }
+
                     recordPerLine++;
+
                     if (recordPerLine >= 1000) {
                         System.out.println("Salto de linea");
                         buff_writer.write(aux, offset_final, aux.length() - 1);
@@ -157,6 +149,7 @@ public class FileManager {
                         offset++;
                     }
                 }
+
                 aux += "|";
                 System.out.println(aux);
                 buff_writer.write(aux, offset_final, aux.length() - 1);
@@ -168,13 +161,13 @@ public class FileManager {
             }
             //Metada Data Init
             if (file.exists()) {
-
                 aux = "|";
                 fw = new FileWriter(file);
                 buff_writer = new BufferedWriter(fw);
+
                 for (FieldDefinition field : fields) {
                     aux += field.getName() + ":";
-                    //aux += field.getSize() + ":";
+                    aux += field.getSize() + ":";
                     aux += field.getType() + ":";
                     aux += field.isKey() + "|";
                 }
@@ -183,7 +176,6 @@ public class FileManager {
                 buff_writer.newLine();
                 aux = Integer.toString(availList_offset);
                 buff_writer.write(aux);
-
                 buff_writer.newLine();
                 buff_writer.write(Integer.toString(offset_final));
                 buff_writer.newLine();
@@ -193,12 +185,8 @@ public class FileManager {
                 fw.close();
                 //METADATA END
             }
-
         } catch (IOException e) {
             e.printStackTrace();
-
         }
-
     }
-
 }

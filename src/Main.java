@@ -1,23 +1,9 @@
-
 import java.io.IOException;
 import java.util.ArrayList;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- *
- * @author Diego
- */
 public class Main {
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) throws IOException {
-        // TODO code application logic here
         FileManager file = new FileManager();
         ArrayList<FieldDefinition> fields = new ArrayList<>();
         ArrayList<Record> records = new ArrayList<>();
@@ -33,7 +19,7 @@ public class Main {
         fields.add(new FieldDefinition(aux3, "char", 20, false));
         fields.add(new FieldDefinition(aux4, "char", 20, false));
         fields.add(new FieldDefinition(aux5, "char", 20, false));
-        
+
         field.add(aux1);
         field.add("15");
         field.add(aux3);
@@ -43,7 +29,7 @@ public class Main {
         for (int i = 0; i < 100; i++) {
             records.add(new Record(5, field));
         }
-        
+
         if (file.newFile("Archivo", fields)) {
             System.out.println("Escribio en el archivo");
             file.saveFile(records);
