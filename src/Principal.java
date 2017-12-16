@@ -709,6 +709,7 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_mi_modifyfieldActionPerformed
 
     private void jb_addformtableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_addformtableActionPerformed
+
         DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
         DefaultComboBoxModel comboBoxModel = (DefaultComboBoxModel) cb_fields.getModel();
         String columnName = ((FieldDefinition) comboBoxModel.getSelectedItem()).getName();
@@ -733,16 +734,30 @@ public class Principal extends javax.swing.JFrame {
                 recordFields.add(field);
             }
         }
+
+        for (int i = 0; i < tableModel.getColumnCount(); i++) {
+            System.out.println(tableModel.getColumnName(i));
+        }
+
     }//GEN-LAST:event_jb_addformtableActionPerformed
 
     private void jb_addrecordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_addrecordActionPerformed
         DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
+        Object[] newRow = null;
+        for (int i = 0; i < tableModel.getColumnCount(); i++) {
+            String value = JOptionPane.showInputDialog("Ingrese " + tableModel.getColumnName(i).toLowerCase() + ": ");
+            newRow = new Object[]{value};
 
-        for (FieldDefinition field : recordFields) {
-            String value = JOptionPane.showInputDialog("Ingrese " + field.getName().toLowerCase() + ": ");
-            Object[] newRow = new Object[]{value};
-            tableModel.addRow(newRow);
+            if (i == 0) {
+                tableModel.addRow(newRow);
+            } else {
+                tableModel.setValueAt(value, tableModel.getRowCount()-1,i);
+                
+            }
+
         }
+
+
     }//GEN-LAST:event_jb_addrecordActionPerformed
 
     /**
