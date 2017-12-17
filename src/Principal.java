@@ -567,14 +567,48 @@ public class Principal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void mi_newfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_newfileActionPerformed
-        jf_file.setVisible(true);
-        jf_file.pack(); // Deja el tamaño predeterminado del JFrame.
-        jf_file.setLocationRelativeTo(null);
-        jf_file.setResizable(false);
+        String personName, personAge;
+        int randomName, randomLastName;
+
+        String[] names = {"Juan", "Diego", "Carlos", "Alejandra", "Diana", "Kimberly", "Miguel", "Mario", "Tania", "Luis", "Dinora", "Lucas", "María", "José", "Blanca", "Nicole", "Cristina", "Julio", "César", "Berta", "Marcos", "Liliana", "Iris", "Katherine", "Christian", "Ángel", "Andrés", "Antonia", "Lesly", "Karina"};
+        String[] lastNames = {"Murillo", "Umanzor", "Zúniga", "Pérez", "Martínez", "Mendoza", "Domínguez", "Morales", "López", "García", "Espinoza", "Chávez", "Andino", "Tróchez", "Gutiérrez", "Medina", "Acosta", "Sánchez", "Canales", "Aguilera", "Padilla", "Ramos", "Cruz", "Aguilar", "Castillo", "Barahona", "Pineda", "Reyes", "Mejía", "Flores"};
+
+        fields.add(new FieldDefinition("PersonId", "INT", 6, true));
+        fields.add(new FieldDefinition("PersonName", "INT", 3, false));
+        fields.add(new FieldDefinition("PersonAge", "INT", 3, false));
+        fields.add(new FieldDefinition("CityId", "INT", 2, false));
+
+        for (int i = 0; i < 5000; i++) {
+            ArrayList<String> values = new ArrayList();
+
+            randomName = (int) (Math.random() * 29);
+            randomLastName = (int) (Math.random() * 29);
+            personAge = Integer.toString((int) (Math.random() * 100) + 1);
+            personName = names[randomName];
+
+            values.add(Integer.toString(i));
+            values.add(Integer.toString(i));
+            values.add(personAge);
+            values.add(Integer.toString(i));
+
+            records.add(new Record(31, values));
+        }
+        
+        if (fileManager.newFile("PersonFile", fields)) {
+            System.out.println("Escribió en el archivo");
+
+            try {
+                fileManager.saveFile(records);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        JOptionPane.showMessageDialog(this, "¡Archivo de prueba creado!");
     }//GEN-LAST:event_mi_newfileActionPerformed
 
     private void mi_savefileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_savefileActionPerformed
-        String aux1 = "Ciudad";
+        /*String aux1 = "Ciudad";
         String aux3 = "Nombre";
         String aux4 = "Apellido";
         String aux5 = "Carrera";
@@ -590,29 +624,26 @@ public class Principal extends javax.swing.JFrame {
         fields.add(new FieldDefinition(aux3, "CHAR", 20, false));
         fields.add(new FieldDefinition(aux4, "CHAR", 20, false));
         fields.add(new FieldDefinition(aux5, "CHAR", 20, false));
-        
+
         for (int i = 0; i < 2500; i++) {
             records.add(new Record(15, recordFields));
         }
 
-        if (fileManager.newFile("Archivo", fields)) {
+        if (fileManager.newFile("PersonFile", fields)) {
             System.out.println("Escribió en el archivo");
 
             try {
-                System.out.println("TAMAÑO: " + records.size());
                 fileManager.saveFile(records);
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            System.out.println(records.size());
-
             try {
-                fileManager.loadFile("Archivo");
+                fileManager.loadFile("PersonFile");
             } catch (IOException ex) {
                 Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+        }*/
 
         JOptionPane.showMessageDialog(this, "Archivo guardado correctamente");
     }//GEN-LAST:event_mi_savefileActionPerformed
