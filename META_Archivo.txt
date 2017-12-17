@@ -1,0 +1,4 @@
+|ID:8:INT:true|Teléfono:8:INT:false|ID:20:INT:true|Ciudad:20:CHAR:false|Nombre:20:CHAR:false|Apellido:20:CHAR:false|Carrera:20:CHAR:false|
+-1
+0
+0

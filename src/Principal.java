@@ -1,4 +1,5 @@
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.swing.*;
 import javax.swing.table.*;
@@ -44,7 +45,7 @@ public class Principal extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         cb_fields = new javax.swing.JComboBox<>();
-        jb_addformtable = new javax.swing.JButton();
+        jb_addfieldtotable = new javax.swing.JButton();
         jb_addrecord = new javax.swing.JButton();
         jp_add = new javax.swing.JPanel();
         jp_modify = new javax.swing.JPanel();
@@ -245,10 +246,10 @@ public class Principal extends javax.swing.JFrame {
 
         jLabel6.setText("Campos");
 
-        jb_addformtable.setText("Agregar Campo");
-        jb_addformtable.addActionListener(new java.awt.event.ActionListener() {
+        jb_addfieldtotable.setText("Agregar Campo");
+        jb_addfieldtotable.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jb_addformtableActionPerformed(evt);
+                jb_addfieldtotableActionPerformed(evt);
             }
         });
 
@@ -275,7 +276,7 @@ public class Principal extends javax.swing.JFrame {
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(jp_fieldsLayout.createSequentialGroup()
                 .addGap(75, 75, 75)
-                .addComponent(jb_addformtable)
+                .addComponent(jb_addfieldtotable)
                 .addGap(55, 55, 55)
                 .addComponent(jb_addrecord)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -291,7 +292,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(cb_fields, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(67, 67, 67)
                 .addGroup(jp_fieldsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jb_addformtable)
+                    .addComponent(jb_addfieldtotable)
                     .addComponent(jb_addrecord))
                 .addContainerGap(90, Short.MAX_VALUE))
         );
@@ -573,9 +574,37 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_mi_newfileActionPerformed
 
     private void mi_savefileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_savefileActionPerformed
+        String aux1 = "Ciudad";
+        String aux3 = "Nombre";
+        String aux4 = "Apellido";
+        String aux5 = "Carrera";
+
+        recordFields.add("11611303");
+        recordFields.add("15");
+        recordFields.add(aux3);
+        recordFields.add(aux4);
+        recordFields.add(aux5);
+
+        fields.add(new FieldDefinition("ID", "INT", 20, true));
+        fields.add(new FieldDefinition(aux1, "CHAR", 20, false));
+        fields.add(new FieldDefinition(aux3, "CHAR", 20, false));
+        fields.add(new FieldDefinition(aux4, "CHAR", 20, false));
+        fields.add(new FieldDefinition(aux5, "CHAR", 20, false));
+        
+        for (int i = 0; i < 2500; i++) {
+            records.add(new Record(15, recordFields));
+        }
+
         if (fileManager.newFile("Archivo", fields)) {
             System.out.println("Escribió en el archivo");
-            fileManager.saveFile(records);
+
+            try {
+                System.out.println("TAMAÑO: " + records.size());
+                fileManager.saveFile(records);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
             System.out.println(records.size());
 
             try {
@@ -672,6 +701,8 @@ public class Principal extends javax.swing.JFrame {
             model.addRow(newRow);
             jt_fields.setModel(model);
         }
+
+        jt_fields.updateUI();
     }//GEN-LAST:event_jTabbedPane1MouseClicked
 
     private void mi_deletefieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_deletefieldActionPerformed
@@ -702,48 +733,41 @@ public class Principal extends javax.swing.JFrame {
         } else {
             JOptionPane.showMessageDialog(this, "¡Seleccione un campo primero!");
         }
-
-        for (int i = 0; i < fields.size(); i++) {
-            System.out.println(fields.get(i));
-        }
     }//GEN-LAST:event_mi_modifyfieldActionPerformed
 
-    private void jb_addformtableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_addformtableActionPerformed
-
-        DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
+    private void jb_addfieldtotableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_addfieldtotableActionPerformed
+        DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel(); // modelo
         DefaultComboBoxModel comboBoxModel = (DefaultComboBoxModel) cb_fields.getModel();
-        String columnName = ((FieldDefinition) comboBoxModel.getSelectedItem()).getName();
-        boolean exists = false;
+        String columnName = ((FieldDefinition) comboBoxModel.getSelectedItem()).getName(); // Nombre de la columna de la tabla.
+        boolean exists = false; // Si el campo ya existe en la tabla.
         FieldDefinition field = (FieldDefinition) comboBoxModel.getSelectedItem();
 
-        if (tableModel.getColumnCount() == 0) {
+        if (tableModel.getColumnCount() == 0) { // Si es el primer campo que agrega...
             tableModel.addColumn(field.getName());
         } else {
             for (int i = 0; i < tableModel.getColumnCount(); i++) {
-                if (columnName.equals(tableModel.getColumnName(i))) {
+                if (columnName.equals(tableModel.getColumnName(i))) { // Si el campo ya existe en la tabla...
                     JOptionPane.showMessageDialog(this, "¡Este campo ya existe!");
                     exists = true;
                     break;
                 }
             }
 
-            if (!exists) {
-                tableModel.addColumn(((FieldDefinition) comboBoxModel.getSelectedItem()).getName());
-                recordFields.add(field);
+            if (!exists) { // Si el campo no existe en la tabla...
+                tableModel.addColumn(((FieldDefinition) comboBoxModel.getSelectedItem()).getName()); // Agrega el campo a la tabla.
                 JOptionPane.showMessageDialog(this, "¡Campo agregado exitosamente a la tabla!");
-                recordFields.add(field);
             }
         }
 
         for (int i = 0; i < tableModel.getColumnCount(); i++) {
             System.out.println(tableModel.getColumnName(i));
         }
-
-    }//GEN-LAST:event_jb_addformtableActionPerformed
+    }//GEN-LAST:event_jb_addfieldtotableActionPerformed
 
     private void jb_addrecordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_addrecordActionPerformed
         DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
         Object[] newRow = null;
+
         for (int i = 0; i < tableModel.getColumnCount(); i++) {
             String value = JOptionPane.showInputDialog("Ingrese " + tableModel.getColumnName(i).toLowerCase() + ": ");
             newRow = new Object[]{value};
@@ -751,13 +775,10 @@ public class Principal extends javax.swing.JFrame {
             if (i == 0) {
                 tableModel.addRow(newRow);
             } else {
-                tableModel.setValueAt(value, tableModel.getRowCount()-1,i);
-                
+                recordFields.add(value); // Agrega el campo a la lista de campos del registro.
+                tableModel.setValueAt(value, tableModel.getRowCount() - 1, i);
             }
-
         }
-
-
     }//GEN-LAST:event_jb_addrecordActionPerformed
 
     /**
@@ -813,7 +834,7 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JTabbedPane jTabbedPane3;
     private javax.swing.JButton jb_addfield;
-    private javax.swing.JButton jb_addformtable;
+    private javax.swing.JButton jb_addfieldtotable;
     private javax.swing.JButton jb_addrecord;
     private javax.swing.JButton jb_deleterecord;
     private javax.swing.JFrame jf_field;
@@ -850,7 +871,7 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JTextField tf_fieldtype;
     // End of variables declaration//GEN-END:variables
     ArrayList<FieldDefinition> fields = new ArrayList();
-    ArrayList<FieldDefinition> recordFields = new ArrayList();
+    ArrayList<String> recordFields = new ArrayList();
     ArrayList<Record> records = new ArrayList();
     FileManager fileManager = new FileManager();
     int FIELDS = 0;
