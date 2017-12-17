@@ -19,16 +19,15 @@ public class Principal extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         this.setExtendedState(MAXIMIZED_BOTH);
 
-        File file = new File("META" + "_Archivo" + ".txt");
+        /*File file = new File("META_" + "PersonFile" + ".txt");
 
         if (file.exists()) {
             FileReader fr = new FileReader(file);
             BufferedReader buff_reader = new BufferedReader(fr);
             String stringField = buff_reader.readLine();
             fields = new ArrayList<>();
-            DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel(); // modelo
-  
-            
+            DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
+
             StringTokenizer tokenField = new StringTokenizer(stringField, "|", false);
 
             while (tokenField.hasMoreTokens()) {
@@ -45,14 +44,11 @@ public class Principal extends javax.swing.JFrame {
                     }
 
                     fields.add(new FieldDefinition(name, type, size, key));
+                    System.out.println(fields.size());
                     tableModel.addColumn(name);
-
                 }
             }
-            
-            
-
-        }
+        }*/
     }
 
     @SuppressWarnings("unchecked")
@@ -606,51 +602,26 @@ public class Principal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void mi_newfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_newfileActionPerformed
-        String personName, personAge;
-        int randomName, randomLastName;
+        createPersonFile();
 
-        String[] names = {"Juan", "Diego", "Carlos", "Alejandra", "Diana", "Kimberly", "Miguel", "Mario", "Tania", "Luis", "Dinora", "Lucas", "María", "José", "Blanca", "Nicole", "Cristina", "Julio", "César", "Berta", "Marcos", "Liliana", "Iris", "Katherine", "Christian", "Ángel", "Andrés", "Antonia", "Lesly", "Karina"};
-        String[] lastNames = {"Murillo", "Umanzor", "Zúniga", "Pérez", "Martínez", "Mendoza", "Domínguez", "Morales", "López", "García", "Espinoza", "Chávez", "Andino", "Tróchez", "Gutiérrez", "Medina", "Acosta", "Sánchez", "Canales", "Aguilera", "Padilla", "Ramos", "Cruz", "Aguilar", "Castillo", "Barahona", "Pineda", "Reyes", "Mejía", "Flores"};
+        JOptionPane.showMessageDialog(this, "¡Creo el archivo de personas!");
 
-        fields.add(new FieldDefinition("PersonId", "INT", 6, true));
-        fields.add(new FieldDefinition("PersonName", "INT", 3, false));
-        fields.add(new FieldDefinition("PersonAge", "INT", 3, false));
-        fields.add(new FieldDefinition("CityId", "INT", 2, false));
-
-        for (int i = 0; i < 5000; i++) {
-            ArrayList<String> values = new ArrayList();
-
-            randomName = (int) (Math.random() * 29);
-            randomLastName = (int) (Math.random() * 29);
-            personAge = Integer.toString((int) (Math.random() * 100) + 1);
-            personName = names[randomName];
-
-            values.add(Integer.toString(i));
-            values.add(Integer.toString(i));
-            values.add(personAge);
-            values.add(Integer.toString(i));
-
-            records.add(new Record(31, values));
+        //createCityFile();
+        
+        //JOptionPane.showMessageDialog(this, "¡Creó el archivo de ciudades!");
+        
+        try {
+            fileManager.loadRecords();
+        } catch (IOException ex) {
+            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        if (fileManager.newFile("PersonFile", fields)) {
-            System.out.println("Escribió en el archivo");
-
-            try {
-                fileManager.saveFile(records);
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        JOptionPane.showMessageDialog(this, "¡Archivo de prueba creado!");
     }//GEN-LAST:event_mi_newfileActionPerformed
 
     private void mi_savefileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_savefileActionPerformed
-        /*String aux1 = "Ciudad";
-        String aux3 = "Nombre";
-        String aux4 = "Apellido";
-        String aux5 = "Carrera";
+        String aux1 = "Tegucigalpa";
+        String aux3 = "Ilich";
+        String aux4 = "García";
+        String aux5 = "ING";
 
         recordFields.add("11611303");
         recordFields.add("15");
@@ -682,7 +653,7 @@ public class Principal extends javax.swing.JFrame {
             } catch (IOException ex) {
                 Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }*/
+        }
 
         JOptionPane.showMessageDialog(this, "Archivo guardado correctamente");
     }//GEN-LAST:event_mi_savefileActionPerformed
@@ -834,10 +805,6 @@ public class Principal extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "¡Campo agregado exitosamente a la tabla!");
             }
         }
-
-        for (int i = 0; i < tableModel.getColumnCount(); i++) {
-            System.out.println(tableModel.getColumnName(i));
-        }
     }//GEN-LAST:event_jb_addfieldtotableActionPerformed
 
     private void jb_addrecordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_addrecordActionPerformed
@@ -892,6 +859,91 @@ public class Principal extends javax.swing.JFrame {
                 }
             }
         });
+    }
+
+    public void createPersonFile() {
+        String personId, personName, personAge, cityId;
+        int randomName, randomLastName;
+
+        String[] names = {"Juan", "Diego", "Carlos", "Alejandra", "Diana", "Kimberly", "Miguel", "Mario", "Tania", "Luis", "Dinora", "Lucas", "Maria", "Jose", "Blanca", "Nicole", "Cristina", "Julio", "Cesar", "Berta", "Marcos", "Liliana", "Iris", "Katherine", "Christian", "Angel", "Andres", "Antonia", "Lesly", "Karina"};
+        String[] lastNames = {"Murillo", "Umanzor", "Zuniga", "Perez", "Martinez", "Mendoza", "Dominguez", "Morales", "Lopez", "Garcia", "Espinoza", "Chavez", "Andino", "Trochez", "Gutierrez", "Medina", "Acosta", "Sanchez", "Canales", "Aguilera", "Padilla", "Ramos", "Cruz", "Aguilar", "Castillo", "Barahona", "Pineda", "Reyes", "Mejia", "Flores"};
+
+        fields.add(new FieldDefinition("PersonId", "INT", 6, true));
+        fields.add(new FieldDefinition("PersonName", "CHAR", 30, false));
+        fields.add(new FieldDefinition("PersonAge", "INT", 3, false));
+        fields.add(new FieldDefinition("CityId", "INT", 4, false));
+
+        for (int i = 0; i < 5000; i++) {
+            ArrayList<String> values = new ArrayList();
+            randomName = (int) (Math.random() * 29);
+            randomLastName = (int) (Math.random() * 29);
+            personId = Integer.toString(i); // ID de la persona.
+            personName = names[randomName] + " " + lastNames[randomLastName]; // Nombre de la persona.
+            personAge = Integer.toString((int) (Math.random() * 100) + 1); // Edad de la persona.
+            cityId = Integer.toString(i); // ID de la ciudad.
+
+            values.add(personId); // Agregando valores de los campos al arreglo de registros.
+            values.add(personName);
+            values.add(personAge);
+            values.add(cityId);
+
+            records.add(new Record(4, values));
+        }
+
+        for (Record record : records) {
+            System.out.println(record.getField());
+        }
+
+        if (fileManager.newFile("PersonFile", fields)) {
+            try {
+                fileManager.loadFile("PersonFile");
+            } catch (IOException ex) {
+                Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            try {
+                System.out.println("Escribió en el archivo 1");
+                fileManager.saveFile(records);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    public void createCityFile() {
+        String cityId, cityName;
+        int randomCity;
+
+        records = new ArrayList();
+        fields = new ArrayList();
+
+        String[] cities = {"Delaware", "Pennsylvania", "Nueva Jersey", "Georgia", "Connecticut", "Massachusetts", "Marylan", "Carolina del Sur", "Nuevo Hampshire", "Virginia", "Nueva York", "Carolina del Norte", "Rhode Island", "Vermont", "Kentucky", "Tennessee", "Ohio", "Louisiana", "Indiana", "Mississippi", "Illinois", "Alabama", "Maine", "Missouri", "Arkansas", "Michigan", "Florida", "Texas", "Iowa", "Wisconsin", "California", "Minnesota", "Oregon", "Kansas", "Virginia Occidental", "Nevada", "Nebraska", "Colorado", "Dakota del Norte", "Dakota del Sur", "Montana", "Washington", "Idaho", "Wyoming", "Utah", "Oklahoma", "Nuevo Mexico", "Arizona", "Alaska", "Hawaii"};
+
+        fields.add(new FieldDefinition("CityId", "INT", 4, true));
+        fields.add(new FieldDefinition("CityName", "CHAR", 30, false));
+
+        for (int i = 0; i < 5000; i++) {
+            ArrayList<String> values = new ArrayList();
+
+            randomCity = (int) (Math.random() * 49);
+            cityId = Integer.toString(i); // ID de la ciudad.
+            cityName = cities[randomCity]; // Nombre de la ciudad.
+
+            values.add(cityId);
+            values.add(cityName);
+
+            records.add(new Record(2, values));
+        }
+
+        if (fileManager.newFile("CityFile", fields)) {
+
+            try {
+                fileManager.saveFile(records);
+                System.out.println("Escribió en el archivo 2");
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -957,5 +1009,6 @@ public class Principal extends javax.swing.JFrame {
     ArrayList<String> recordFields = new ArrayList();
     ArrayList<Record> records = new ArrayList();
     FileManager fileManager = new FileManager();
+    FileManager fileCity = new FileManager();
     int FIELDS = 0;
 }

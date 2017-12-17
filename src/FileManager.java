@@ -12,6 +12,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -119,7 +121,6 @@ public class FileManager {
         //File file = new File("META"+pathname+".txt");
 
         if (file.exists()) {
-            System.out.println("HIZO CARGAR");
             this.file = new File(pathname);
             File metaFile = new File("META_" + pathname + ".txt");
             //Cargar FileDefinitions
@@ -151,6 +152,7 @@ public class FileManager {
 
             buff_reader.close();
         }
+        System.out.println("HIZO CARGAR");
 
     }
 
@@ -228,101 +230,95 @@ public class FileManager {
                             moveBR += 4;
                         }
                         //!!!!TERMINA CONVERSION DE TIPO//////
-                    } else {
-                        //Si cambia solo el tamano
-                        if (newFields.get(i).getType().equals("CHAR")) {
-
-                            if (newFields.get(i).getSize() < fields.get(i).getSize()) {
-                                for (int j = 0; j < newFields.get(i).getSize(); j++) {
-                                    moveBW++;
-                                    moveBR++;
-                                    buffWrite[moveBW] = buffRead[moveBR];
-
-                                }
-                                moveBR+=fields.get(i).getSize()-newFields.get(i).getSize();
-
-                            } else {
-                                //Hay que rellenar el espacio 
-                                System.out.println("Cambia tamano");
-                                String aux = "";
-                                for (int j = 0; j < newFields.get(i).getSize() - fields.get(i).getSize(); j++) {
-                                    aux += "*";
-                                }
-                                System.out.println(aux);
-                                byte[] temp = stringToByte(aux);
-                                System.out.println(temp.length);
-                                System.out.println(fields.get(i).getSize());
-                                //Copiar en el buffWrite
-                                for (int j = 0; j < fields.get(i).getSize(); j++) {
-                                    moveBW++;
-                                    moveBR++;
-                                    buffWrite[moveBW] = buffRead[moveBR];
-
-                                }
-                                for (int j = 0; j < temp.length; j++) {
-                                    moveBW++;
-                                    buffWrite[moveBW] = temp[j];
-
-                                }
-                                moveBR += fields.get(i).getSize();
-
-                            }
-
-                        } else if (newFields.get(i).getType().equals("INT")) {
-                            //VALOR POR DEFECTO
-                            byte[] temp = toByteArray(0);
-                            for (int j = 0; j < temp.length; j++) {
-                                moveBW++;
-                                buffWrite[moveBW] = temp[j];
-                            }
-                            moveBR += 4;
-                        } else if (newFields.get(i).getType().equals("FLOAT")) {
-                            byte[] temp = float2ByteArray((float) 0.0);
-                            for (int j = 0; j < temp.length; j++) {
-                                moveBW++;
-                                buffWrite[moveBW] = temp[j];
-                            }
-                            moveBR += 4;
-                        }
-                        //Se mueve en el BR;
-
-                    }
-
-                } else {
-                    //Si son iguales solo copiara la informacion
+                    } else //Si cambia solo el tamano
                     if (newFields.get(i).getType().equals("CHAR")) {
-                        for (int j = 0; j < newFields.get(i).getSize(); j++) {
-                            moveBW++;
-                            moveBR++;
-                            buffWrite[moveBW] = buffRead[moveBR];
+
+                        if (newFields.get(i).getSize() < fields.get(i).getSize()) {
+                            for (int j = 0; j < newFields.get(i).getSize(); j++) {
+                                moveBW++;
+                                moveBR++;
+                                buffWrite[moveBW] = buffRead[moveBR];
+
+                            }
+                            moveBR += fields.get(i).getSize() - newFields.get(i).getSize();
+
+                        } else {
+                            //Hay que rellenar el espacio 
+                            System.out.println("Cambia tamano");
+                            String aux = "";
+                            for (int j = 0; j < newFields.get(i).getSize() - fields.get(i).getSize(); j++) {
+                                aux += "*";
+                            }
+                            System.out.println(aux);
+                            byte[] temp = stringToByte(aux);
+                            System.out.println(temp.length);
+                            System.out.println(fields.get(i).getSize());
+                            //Copiar en el buffWrite
+                            for (int j = 0; j < fields.get(i).getSize(); j++) {
+                                moveBW++;
+                                moveBR++;
+                                buffWrite[moveBW] = buffRead[moveBR];
+
+                            }
+                            for (int j = 0; j < temp.length; j++) {
+                                moveBW++;
+                                buffWrite[moveBW] = temp[j];
+
+                            }
+                            moveBR += fields.get(i).getSize();
+
                         }
+
                     } else if (newFields.get(i).getType().equals("INT")) {
-                        for (int j = 0; j < 4; j++) {
+                        //VALOR POR DEFECTO
+                        byte[] temp = toByteArray(0);
+                        for (int j = 0; j < temp.length; j++) {
                             moveBW++;
-                            moveBR++;
-                            buffWrite[moveBW] = buffRead[moveBR];
+                            buffWrite[moveBW] = temp[j];
                         }
+                        moveBR += 4;
                     } else if (newFields.get(i).getType().equals("FLOAT")) {
-                        for (int j = 0; j < 4; j++) {
+                        byte[] temp = float2ByteArray((float) 0.0);
+                        for (int j = 0; j < temp.length; j++) {
                             moveBW++;
-                            moveBR++;
-                            buffWrite[moveBW] = buffRead[moveBR];
+                            buffWrite[moveBW] = temp[j];
                         }
+                        moveBR += 4;
+                    } //Se mueve en el BR;
+
+                } else //Si son iguales solo copiara la informacion
+                if (newFields.get(i).getType().equals("CHAR")) {
+                    for (int j = 0; j < newFields.get(i).getSize(); j++) {
+                        moveBW++;
+                        moveBR++;
+                        buffWrite[moveBW] = buffRead[moveBR];
+                    }
+                } else if (newFields.get(i).getType().equals("INT")) {
+                    for (int j = 0; j < 4; j++) {
+                        moveBW++;
+                        moveBR++;
+                        buffWrite[moveBW] = buffRead[moveBR];
+                    }
+                } else if (newFields.get(i).getType().equals("FLOAT")) {
+                    for (int j = 0; j < 4; j++) {
+                        moveBW++;
+                        moveBR++;
+                        buffWrite[moveBW] = buffRead[moveBR];
                     }
                 }
-                
+
                 //REINDEXAR
                 indexFile.seek(0);
                 for (int j = 0; j < byteSize;) {
-                    byte[] keyB = {buffWrite[j] ,buffWrite[j++] ,buffWrite[j++] ,buffWrite[j++]};
+                    byte[] keyB = {buffWrite[j], buffWrite[j++], buffWrite[j++], buffWrite[j++]};
                     indexFile.write(keyB);
                     indexFile.writeLong(indexFile.length());
-                    j+=sizeBuff(newFields)-3;
+                    j += sizeBuff(newFields) - 3;
                 }
                 randFile.seek(0);
                 randFile.write(buffWrite);
                 randFile.setLength(byteSize);
-                
+
                 //if(){}
             }
         } catch (Exception e) {
@@ -378,9 +374,8 @@ public class FileManager {
                 buff_writer.flush();
                 buff_writer.close();
 
-                randFile.seek(randFile.length());
-                indexFile.seek(indexFile.length());
-                System.out.println(fields.size());
+                randFile.seek(0);
+                indexFile.seek(0);
                 int cantReg = 6000 / sizeBuff(fields);
                 int lengthBuff = cantReg * sizeBuff(fields);
                 int offsetBuff = records.size() * sizeBuff(fields);
@@ -391,7 +386,6 @@ public class FileManager {
                     for (int j = 0; j < records.get(i).getField().size(); j++) {
                         if (fields.get(j).isKey()) {
                             //Escribe Llave
-                            System.out.println("PALABRA: " + records.get(i).getField().get(j));
                             indexFile.writeInt(Integer.parseInt(records.get(i).getField().get(j)));
                             //Escribe RRN
                             //USA 8 bytes en vez de 4
@@ -440,11 +434,71 @@ public class FileManager {
 
     }
 
+    public boolean loadRecords() throws IOException {
+        if (file.exists()) {
+            try {
+                RandomAccessFile randFile = new RandomAccessFile(file, "r");
+                randFile.seek(0);
+                byte[] buffFile = new byte[(int) randFile.length()];
+
+                long cantRecord = randFile.length() / sizeBuff(fields);
+                randFile.readFully(buffFile);
+                int cont = 0;
+                int moveBytes = 0;
+                ArrayList<String> record = new ArrayList<>();
+                records.clear();
+                
+                for (int i = 0; cont < cantRecord * fields.size(); i++) {
+                    if (fields.size() == i) {
+                        i = 0;
+                        records.add(new Record(4, record));
+                        record.clear();
+                    }
+                    cont++;
+
+                    if (fields.get(i).getType().equals("CHAR")) {
+                        byte[] field = subArray(buffFile, moveBytes, fields.get(i).getSize());
+                        String st = byteToString(field);
+                        record.add(st);
+                        moveBytes += fields.get(i).getSize();
+                    } else if (fields.get(i).getType().equals("INT")) {
+                        byte[] field = subArray(buffFile, moveBytes, 4);
+                        int integer = fromByteArray(field);
+                        record.add(Integer.toString(integer));
+                        moveBytes += 4;
+                    } else if (fields.get(i).getType().equals("FLOAT")) {
+                        byte[] field = subArray(buffFile, moveBytes, 4);
+                        float floated = convertToFloat(field);
+                        record.add(Float.toString(floated));
+                        moveBytes += 4;
+                    }
+                        System.out.println(record);
+                }
+                records.add(new Record(4, record));
+                randFile.close();
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+        
+        return false;
+
+    }
+
+    public byte[] subArray(byte[] bytes, int ini, int len) {
+        byte[] returnB = new byte[len];
+        for (int i = 0; i < returnB.length; i++) {
+            returnB[i] = bytes[ini];
+            ini++;
+        }
+        return returnB;
+    }
+
     public String convertToken(Record record) {
         String aux = "";
         String patron = "";
         //COntruir patron 
-        System.out.println(fields.size());
         patron += "|";
         for (int i = 0; i < fields.size(); i++) {
 
@@ -460,7 +514,6 @@ public class FileManager {
     public int sizeBuff(ArrayList<FieldDefinition> fields) {
         int size = 0;
 
-        System.out.println(fields.size());
         for (int i = 0; i < fields.size(); i++) {
             if (fields.get(i).getType().equals("CHAR")) {
                 //El numero de caracteres UNICODE y 4 bytes
@@ -471,8 +524,7 @@ public class FileManager {
                 size += 4;
             }
         }
-        
-        System.out.println("HOLA " + size);
+
         return size;
     }
 

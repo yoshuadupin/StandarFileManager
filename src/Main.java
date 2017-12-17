@@ -14,14 +14,14 @@ public class Main {
         String aux5 = "Carrera";
         Integer integer = new Integer(5);
 
-        fields.add(new FieldDefinition(aux1, "char", 20, true));
-        fields.add(new FieldDefinition("Edad", "int", 20, false));
-        fields.add(new FieldDefinition(aux3, "char", 20, false));
-        fields.add(new FieldDefinition(aux4, "char", 20, false));
-        fields.add(new FieldDefinition(aux5, "char", 20, false));
+        fields.add(new FieldDefinition("Número", "CHAR", 20, true));
+        fields.add(new FieldDefinition("Edad", "CHAR", 20, false));
+        fields.add(new FieldDefinition(aux3, "CHAR", 20, false));
+        fields.add(new FieldDefinition(aux4, "CHAR", 20, false));
+        fields.add(new FieldDefinition(aux5, "CHAR", 20, false));
 
-        field.add(aux1);
-        field.add("15");
+        field.add("11611303");
+        field.add("HOLA");
         field.add(aux3);
         field.add(aux4);
         field.add(aux5);

@@ -2,11 +2,9 @@ import java.util.ArrayList;
 
 public class Record {
 
-    private ArrayList<String> field;
+    private ArrayList<String> field = new ArrayList();
 
-    public Record(int size , ArrayList<String> field) {
-        this.field = new ArrayList<>(size);
-        this.field = field;
+    public Record(int size, ArrayList<String> field) {
         this.field = field;
     }
 
