@@ -735,10 +735,51 @@ public class Principal extends javax.swing.JFrame {
 
     private void mi_deletefieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_deletefieldActionPerformed
         DefaultTableModel model = (DefaultTableModel) jt_fields.getModel();
+        DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
+        recordFields.clear();
 
         if (jt_fields.getSelectedRow() >= 0) {
+            for (int i = 0; i < records.size(); i++) {
+                records.get(i).getField().remove(jt_fields.getSelectedRow());
+            }
+
             fields.remove(jt_fields.getSelectedRow());
             model.removeRow(jt_fields.getSelectedRow());
+
+            int rows = tableModel.getRowCount();
+
+            for (int i = rows - 1; i >= 0; i--) {
+                tableModel.removeRow(i);
+                jt_records.setModel(tableModel);
+            }
+            tableModel.setColumnCount(0);
+            
+            
+            //Creando tabla actualizada
+            for (int i = 0; i < fields.size(); i++) {
+                tableModel.addColumn(fields.get(i).getName()); // Agrega el campo a la tabla.
+                jt_records.setModel(tableModel);
+            }
+
+            for (int i = 0; i < records.size(); i++) {
+                for (int j = 0; j < records.get(i).getField().size(); j++) {
+                    String value = records.get(i).getField().get(j);
+                    Object[] newRow = new Object[]{value};
+                    if (j == 0) {
+                        tableModel.addRow(newRow);
+                        recordFields.add(value);
+
+                    } else {
+                        recordFields.add(value); // Agrega el campo a la lista de campos del registro.
+                        tableModel.setValueAt(value, tableModel.getRowCount() - 1, j);
+
+                    }
+                    jt_records.setModel(tableModel);
+                }
+
+            }
+
+            jt_fields.updateUI();
 
             JOptionPane.showMessageDialog(this, "¡Campo eliminado exitosamente!");
         } else {
@@ -790,20 +831,24 @@ public class Principal extends javax.swing.JFrame {
 
     private void jb_addrecordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_addrecordActionPerformed
         jb_addfieldtotable.setEnabled(false);
+        ArrayList<String> fields = new ArrayList();
         DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
         Object[] newRow = null;
 
         for (int i = 0; i < tableModel.getColumnCount(); i++) {
             String value = JOptionPane.showInputDialog("Ingrese " + tableModel.getColumnName(i).toLowerCase() + ": ");
             newRow = new Object[]{value};
+            fields.add(value);
 
             if (i == 0) {
                 tableModel.addRow(newRow);
+                recordFields.add(value);
             } else {
                 recordFields.add(value); // Agrega el campo a la lista de campos del registro.
                 tableModel.setValueAt(value, tableModel.getRowCount() - 1, i);
             }
         }
+        records.add(new Record(fields.size(),fields));
     }//GEN-LAST:event_jb_addrecordActionPerformed
 
     /**
