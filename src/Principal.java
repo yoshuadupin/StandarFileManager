@@ -13,42 +13,23 @@ import java.util.logging.Logger;
 
 public class Principal extends javax.swing.JFrame {
 
-    public Principal() throws FileNotFoundException, IOException {
+    public Principal() throws IOException {
         initComponents();
         this.pack();
         setLocationRelativeTo(null);
         this.setExtendedState(MAXIMIZED_BOTH);
 
-        /*File file = new File("META_" + "PersonFile" + ".txt");
+        int option;
 
-        if (file.exists()) {
-            FileReader fr = new FileReader(file);
-            BufferedReader buff_reader = new BufferedReader(fr);
-            String stringField = buff_reader.readLine();
-            fields = new ArrayList<>();
-            DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
+        do {
+            option = Integer.parseInt(JOptionPane.showInputDialog("¿Desea abrir PersonFile (1) o CityFile (2)?:"));
+        } while (option <= 0 || option >= 3);
 
-            StringTokenizer tokenField = new StringTokenizer(stringField, "|", false);
-
-            while (tokenField.hasMoreTokens()) {
-                StringTokenizer tokenVar = new StringTokenizer(tokenField.nextToken(), ":", false);
-                while (tokenVar.hasMoreTokens()) {
-                    String name = tokenVar.nextToken();
-                    int size = Integer.parseInt(tokenVar.nextToken());
-                    String type = tokenVar.nextToken();
-                    boolean key;
-                    if (tokenVar.nextToken().equals("true")) {
-                        key = true;
-                    } else {
-                        key = false;
-                    }
-
-                    fields.add(new FieldDefinition(name, type, size, key));
-                    System.out.println(fields.size());
-                    tableModel.addColumn(name);
-                }
-            }
-        }*/
+        if (option == 1) {
+            loadMetaPerson();
+        } else {
+            loadMetaCity();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -604,12 +585,12 @@ public class Principal extends javax.swing.JFrame {
     private void mi_newfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_newfileActionPerformed
         createPersonFile();
 
-        JOptionPane.showMessageDialog(this, "¡Creo el archivo de personas!");
+        JOptionPane.showMessageDialog(this, "¡Creó el archivo de personas!");
 
-        //createCityFile();
-        
-        //JOptionPane.showMessageDialog(this, "¡Creó el archivo de ciudades!");
-        
+        createCityFile();
+
+        JOptionPane.showMessageDialog(this, "¡Creó el archivo de ciudades!");
+
         try {
             fileManager.loadRecords();
         } catch (IOException ex) {
@@ -900,7 +881,7 @@ public class Principal extends javax.swing.JFrame {
             } catch (IOException ex) {
                 Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
             try {
                 System.out.println("Escribió en el archivo 1");
                 fileManager.saveFile(records);
@@ -946,6 +927,71 @@ public class Principal extends javax.swing.JFrame {
         }
     }
 
+    public final void loadMetaPerson() throws FileNotFoundException, IOException {
+        File file = new File("META_" + "PersonFile" + ".txt");
+
+        if (file.exists()) {
+            FileReader fr = new FileReader(file);
+            BufferedReader buff_reader = new BufferedReader(fr);
+            String stringField = buff_reader.readLine();
+            fields = new ArrayList<>();
+            DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
+
+            StringTokenizer tokenField = new StringTokenizer(stringField, "|", false);
+
+            while (tokenField.hasMoreTokens()) {
+                StringTokenizer tokenVar = new StringTokenizer(tokenField.nextToken(), ":", false);
+                while (tokenVar.hasMoreTokens()) {
+                    String name = tokenVar.nextToken();
+                    int size = Integer.parseInt(tokenVar.nextToken());
+                    String type = tokenVar.nextToken();
+                    boolean key;
+                    if (tokenVar.nextToken().equals("true")) {
+                        key = true;
+                    } else {
+                        key = false;
+                    }
+
+                    fields.add(new FieldDefinition(name, type, size, key));
+                    System.out.println(fields.size());
+                    tableModel.addColumn(name);
+                }
+            }
+        }
+    }
+    
+    public final void loadMetaCity() throws FileNotFoundException, IOException {
+        File file = new File("META_" + "CityFile" + ".txt");
+
+        if (file.exists()) {
+            FileReader fr = new FileReader(file);
+            BufferedReader buff_reader = new BufferedReader(fr);
+            String stringField = buff_reader.readLine();
+            fields = new ArrayList<>();
+            DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
+
+            StringTokenizer tokenField = new StringTokenizer(stringField, "|", false);
+
+            while (tokenField.hasMoreTokens()) {
+                StringTokenizer tokenVar = new StringTokenizer(tokenField.nextToken(), ":", false);
+                while (tokenVar.hasMoreTokens()) {
+                    String name = tokenVar.nextToken();
+                    int size = Integer.parseInt(tokenVar.nextToken());
+                    String type = tokenVar.nextToken();
+                    boolean key;
+                    if (tokenVar.nextToken().equals("true")) {
+                        key = true;
+                    } else {
+                        key = false;
+                    }
+
+                    fields.add(new FieldDefinition(name, type, size, key));
+                    System.out.println(fields.size());
+                    tableModel.addColumn(name);
+                }
+            }
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> cb_fieldkey;
     private javax.swing.JComboBox<String> cb_fields;
