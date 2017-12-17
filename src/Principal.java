@@ -1,19 +1,58 @@
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Principal extends javax.swing.JFrame {
 
-    public Principal() {
+    public Principal() throws FileNotFoundException, IOException {
         initComponents();
         this.pack();
         setLocationRelativeTo(null);
         this.setExtendedState(MAXIMIZED_BOTH);
+
+        File file = new File("META" + "_Archivo" + ".txt");
+
+        if (file.exists()) {
+            FileReader fr = new FileReader(file);
+            BufferedReader buff_reader = new BufferedReader(fr);
+            String stringField = buff_reader.readLine();
+            fields = new ArrayList<>();
+            DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel(); // modelo
+  
+            
+            StringTokenizer tokenField = new StringTokenizer(stringField, "|", false);
+
+            while (tokenField.hasMoreTokens()) {
+                StringTokenizer tokenVar = new StringTokenizer(tokenField.nextToken(), ":", false);
+                while (tokenVar.hasMoreTokens()) {
+                    String name = tokenVar.nextToken();
+                    int size = Integer.parseInt(tokenVar.nextToken());
+                    String type = tokenVar.nextToken();
+                    boolean key;
+                    if (tokenVar.nextToken().equals("true")) {
+                        key = true;
+                    } else {
+                        key = false;
+                    }
+
+                    fields.add(new FieldDefinition(name, type, size, key));
+                    tableModel.addColumn(name);
+
+                }
+            }
+            
+            
+
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -593,7 +632,7 @@ public class Principal extends javax.swing.JFrame {
 
             records.add(new Record(31, values));
         }
-        
+
         if (fileManager.newFile("PersonFile", fields)) {
             System.out.println("Escribió en el archivo");
 
@@ -603,7 +642,7 @@ public class Principal extends javax.swing.JFrame {
                 Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
         JOptionPane.showMessageDialog(this, "¡Archivo de prueba creado!");
     }//GEN-LAST:event_mi_newfileActionPerformed
 
@@ -710,8 +749,8 @@ public class Principal extends javax.swing.JFrame {
             isKey = cb_fieldkey.getSelectedIndex() != 0;
 
             FieldDefinition field = new FieldDefinition(name, type, size, isKey);
-            
-            if(field.isKey()){
+
+            if (field.isKey()) {
                 for (int i = 0; i < fields.size(); i++) {
                     fields.get(i).setKey(false);
                 }
@@ -844,7 +883,13 @@ public class Principal extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Principal().setVisible(true);
+                try {
+                    new Principal().setVisible(true);
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
