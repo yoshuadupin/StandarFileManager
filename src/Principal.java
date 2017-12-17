@@ -796,6 +796,7 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_jb_addfieldtotableActionPerformed
 
     private void jb_addrecordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_addrecordActionPerformed
+        jb_addfieldtotable.setEnabled(false);
         DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
         Object[] newRow = null;
 
