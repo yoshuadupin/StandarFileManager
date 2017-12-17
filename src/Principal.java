@@ -710,6 +710,12 @@ public class Principal extends javax.swing.JFrame {
             isKey = cb_fieldkey.getSelectedIndex() != 0;
 
             FieldDefinition field = new FieldDefinition(name, type, size, isKey);
+            
+            if(field.isKey()){
+                for (int i = 0; i < fields.size(); i++) {
+                    fields.get(i).setKey(false);
+                }
+            }
 
             fields.add(field);
             JOptionPane.showMessageDialog(this, "¡Campo agregado a la lista exitosamente!");
