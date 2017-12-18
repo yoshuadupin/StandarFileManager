@@ -573,7 +573,7 @@ public class Principal extends javax.swing.JFrame {
 
     private void mi_newfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_newfileActionPerformed
          createPersonFile();
-
+         keys=1;
         JOptionPane.showMessageDialog(this, "¡Creó el archivo de personas!");
 
         //createCityFile();
@@ -778,14 +778,45 @@ public class Principal extends javax.swing.JFrame {
 
     private void mi_modifyfieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_modifyfieldActionPerformed
         DefaultTableModel model = (DefaultTableModel) jt_fields.getModel();
-        int size;
-
-        size = Integer.parseInt((String) model.getValueAt(jt_fields.getSelectedRow(), 2));
 
         if (jt_fields.getSelectedRow() >= 0) {
-            fields.get(jt_fields.getSelectedRow()).setName((String) model.getValueAt(jt_fields.getSelectedRow(), 0)); // Seteando nombre.
-            fields.get(jt_fields.getSelectedRow()).setType((String) model.getValueAt(jt_fields.getSelectedRow(), 1)); // Seteando tipo.
-            fields.get(jt_fields.getSelectedRow()).setSize(size); // Seteando longitud.
+            boolean key;
+            String nombre = JOptionPane.showInputDialog("Ingrese el nuevo nombre del campo: ");
+            int size = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el tamaño del campo: "));
+            String tipo = JOptionPane.showInputDialog("Ingrese el nuevo tipo de campo:");
+            int key1 = Integer.parseInt(JOptionPane.showInputDialog("Ingrese 1.Si es llave o 2.Si no es llave \n Si ingresa otro número se tomara que no es llave: "));
+            System.out.println(key1);
+            if (key1 == 1) {
+                if (keys == 1) {
+                    JOptionPane.showMessageDialog(jt_fields, "No pueden existir dos llaves");
+                    key = false;
+                } else {
+                    key = true;
+                    model.setValueAt("true", jt_fields.getSelectedRow(), 3);
+                    if (tipo != "INT") {
+                        JOptionPane.showMessageDialog(jt_fields, "El campo llave no puede ser diferente a int, se cambiara al tipo int");
+                        tipo = "INT";
+                    }
+                    keys = 1;
+                }
+            } else {
+                if (fields.get(jt_fields.getSelectedRow()).isKey() == true) {
+                    keys = 0;
+                }
+
+                key = false;
+                model.setValueAt("false", jt_fields.getSelectedRow(), 3);
+            }
+            //KEYS ES UN CONTADOR DE LLAVES
+
+            fields.get(jt_fields.getSelectedRow()).setName((nombre));
+            fields.get(jt_fields.getSelectedRow()).setType(tipo);
+            fields.get(jt_fields.getSelectedRow()).setSize(size);
+            fields.get(jt_fields.getSelectedRow()).setKey(key);
+
+            model.setValueAt(nombre, jt_fields.getSelectedRow(), 0);
+            model.setValueAt(tipo, jt_fields.getSelectedRow(), 1);
+            model.setValueAt(size, jt_fields.getSelectedRow(), 2);
 
             JOptionPane.showMessageDialog(this, "¡Campo modificado exitosamente!");
         } else {
@@ -1104,4 +1135,5 @@ public class Principal extends javax.swing.JFrame {
     FileManager fileManager = new FileManager();
     FileManager fileCity = new FileManager();
     int FIELDS = 0;
+    int keys = 1;
 }
