@@ -458,6 +458,7 @@ public class FileManager {
 
     public boolean loadRecords(String pathName) throws IOException {
         this.file = new File(pathName);
+        
 
         if (file.exists()) {
             try {

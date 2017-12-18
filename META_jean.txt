@@ -1,0 +1,4 @@
+|Edad:3:INT:false|lvl:3:INT:true|
+-1
+0
+0

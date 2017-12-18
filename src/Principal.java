@@ -7,7 +7,7 @@ import java.io.IOException;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,27 +19,6 @@ public final class Principal extends javax.swing.JFrame {
         this.pack();
         setLocationRelativeTo(null);
         this.setExtendedState(MAXIMIZED_BOTH);
-
-        int option;
-
-        option = Integer.parseInt(JOptionPane.showInputDialog("¿Cargar personas (1) o cargar ciudades (2)?"));
-
-        if (option == 1) { // Cargar personas.
-            loadMetaPerson();
-            fileManager.setFields(fields);
-            fileManager.loadRecords("PersonFile");
-            records = new ArrayList<>(fileManager.getRecords());
-            refreshTable();
-        } else if(option==2){ // Cargar ciudades.
-            loadMetaCity();
-            System.out.println(fields.size());
-            fileManager.setFields(fields);
-            fileManager.loadRecords("CityFile");
-            records = new ArrayList<>(fileManager.getRecords());
-            refreshTable();
-        }else{
-            
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -61,7 +40,7 @@ public final class Principal extends javax.swing.JFrame {
         tf_fieldsize = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
-        cb_fieldkey = new javax.swing.JComboBox<>();
+        cb_fieldkey = new javax.swing.JComboBox<String>();
         jPanel7 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jt_fields = new javax.swing.JTable();
@@ -70,7 +49,7 @@ public final class Principal extends javax.swing.JFrame {
         jp_fields = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        cb_fields = new javax.swing.JComboBox<>();
+        cb_fields = new javax.swing.JComboBox<String>();
         jb_addfieldtotable = new javax.swing.JButton();
         jb_addrecord = new javax.swing.JButton();
         jp_add = new javax.swing.JPanel();
@@ -95,6 +74,7 @@ public final class Principal extends javax.swing.JFrame {
         mi_newfile = new javax.swing.JMenuItem();
         mi_savefile = new javax.swing.JMenuItem();
         mi_closefile = new javax.swing.JMenuItem();
+        mi_loadfile = new javax.swing.JMenuItem();
         mi_logout = new javax.swing.JMenuItem();
         mi_fields = new javax.swing.JMenuItem();
         mi_records = new javax.swing.JMenuItem();
@@ -161,7 +141,7 @@ public final class Principal extends javax.swing.JFrame {
 
         jLabel8.setText("¿Es llave?");
 
-        cb_fieldkey.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "No", "Sí" }));
+        cb_fieldkey.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No", "Sí" }));
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -227,7 +207,7 @@ public final class Principal extends javax.swing.JFrame {
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                true, true, true, false
+                false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -492,11 +472,6 @@ public final class Principal extends javax.swing.JFrame {
         jm_menu.setText("Menú");
 
         jm_file.setText("Archivo");
-        jm_file.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jm_fileActionPerformed(evt);
-            }
-        });
 
         mi_newfile.setText("Nuevo Archivo");
         mi_newfile.addActionListener(new java.awt.event.ActionListener() {
@@ -515,7 +490,20 @@ public final class Principal extends javax.swing.JFrame {
         jm_file.add(mi_savefile);
 
         mi_closefile.setText("Cerrar Archivo");
+        mi_closefile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mi_closefileActionPerformed(evt);
+            }
+        });
         jm_file.add(mi_closefile);
+
+        mi_loadfile.setText("Cargar");
+        mi_loadfile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mi_loadfileActionPerformed(evt);
+            }
+        });
+        jm_file.add(mi_loadfile);
 
         mi_logout.setText("Salir");
         mi_logout.addActionListener(new java.awt.event.ActionListener() {
@@ -607,15 +595,22 @@ public final class Principal extends javax.swing.JFrame {
         if (option == 1) {
             createPersonFile();
             createCityFile();
+            
         } else {
-            String name = JOptionPane.showInputDialog("Ingrese el nombre del archivo:");
-            fileManager.newFile(name, fields);
-            JOptionPane.showMessageDialog(this, "!El archivo vacío ha sido creado exitosamente!");
+            fileName = JOptionPane.showInputDialog("Ingrese el nombre del archivo");
         }
     }//GEN-LAST:event_mi_newfileActionPerformed
 
     private void mi_savefileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_savefileActionPerformed
+        if (fileManager.newFile(fileName, fields)) {
+            try {
+                fileManager.saveFile(records);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 
+        JOptionPane.showMessageDialog(this, "!El archivo vacío ha sido creado exitosamente!");
     }//GEN-LAST:event_mi_savefileActionPerformed
 
     private void mi_logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_logoutActionPerformed
@@ -642,8 +637,8 @@ public final class Principal extends javax.swing.JFrame {
 
         model = (DefaultComboBoxModel) cb_fields.getModel();
 
-        for (int i = 0; i < fields.size(); i++) {
-            model.addElement(fields.get(i));
+        for (FieldDefinition field : fields) {
+            model.addElement(field);
         }
 
         cb_fields.setModel(model);
@@ -682,7 +677,7 @@ public final class Principal extends javax.swing.JFrame {
 
             FieldDefinition field = new FieldDefinition(name, type, size, isKey);
 
-            if (field.isKey()) {
+            if (field.isKey()) { // REVISAR.
                 for (int i = 0; i < fields.size(); i++) {
                     fields.get(i).setKey(false);
                 }
@@ -694,6 +689,12 @@ public final class Principal extends javax.swing.JFrame {
             tf_fieldsize.setText("");
             tf_fieldtype.setText("");
         }
+        DefaultTableModel model = (DefaultTableModel) jt_fields.getModel();
+
+        for (FieldDefinition field : fields) {
+            Object[] newRow = new Object[]{field.getName(), field.getType(), field.getSize(), field.isKey()};
+            model.addRow(newRow);
+        }
     }//GEN-LAST:event_jb_addfieldActionPerformed
 
     private void jTabbedPane1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTabbedPane1MouseClicked
@@ -704,13 +705,11 @@ public final class Principal extends javax.swing.JFrame {
             model.removeRow(i);
         }
 
-        for (int i = 0; i < fields.size(); i++) {
-            Object[] newRow = new Object[]{fields.get(i).getName(), fields.get(i).getType(), fields.get(i).getSize(), fields.get(i).isKey()};
+        for (FieldDefinition field : fields) {
+            Object[] newRow = new Object[]{field.getName(), field.getType(), field.getSize(), field.isKey()};
             model.addRow(newRow);
             jt_fields.setModel(model);
         }
-
-        jt_fields.updateUI();
     }//GEN-LAST:event_jTabbedPane1MouseClicked
 
     private void mi_deletefieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_deletefieldActionPerformed
@@ -719,8 +718,8 @@ public final class Principal extends javax.swing.JFrame {
         recordFields = new ArrayList();
 
         if (jt_fields.getSelectedRow() >= 0) {
-            for (int i = 0; i < records.size(); i++) {
-                records.get(i).getFields().remove(jt_fields.getSelectedRow());
+            for (Record record : records) {
+                record.getFields().remove(jt_fields.getSelectedRow());
             }
 
             fields.remove(jt_fields.getSelectedRow());
@@ -732,11 +731,12 @@ public final class Principal extends javax.swing.JFrame {
                 tableModel.removeRow(i);
                 jt_records.setModel(tableModel);
             }
+
             tableModel.setColumnCount(0);
 
             //Creando tabla actualizada
-            for (int i = 0; i < fields.size(); i++) {
-                tableModel.addColumn(fields.get(i).getName()); // Agrega el campo a la tabla.
+            for (FieldDefinition field : fields) {
+                tableModel.addColumn(field.getName()); // Agrega el campo a la tabla.
                 jt_records.setModel(tableModel);
             }
 
@@ -774,7 +774,7 @@ public final class Principal extends javax.swing.JFrame {
             String nombre = JOptionPane.showInputDialog("Ingrese el nuevo nombre del campo: ");
             int size = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el tamaño del campo: "));
             String tipo = JOptionPane.showInputDialog("Ingrese el nuevo tipo de campo:");
-            int key1 = Integer.parseInt(JOptionPane.showInputDialog("Ingrese 1.Si es llave o 2.Si no es llave \n Si ingresa otro número se tomara que no es llave: "));
+            int key1 = Integer.parseInt(JOptionPane.showInputDialog("Ingrese 1. Si es llave o 2. Si no es llave \n Si ingresa otro número se tomará que no es llave"));
             System.out.println(key1);
             if (key1 == 1) {
                 if (keys == 1) {
@@ -784,7 +784,7 @@ public final class Principal extends javax.swing.JFrame {
                     key = true;
                     model.setValueAt("true", jt_fields.getSelectedRow(), 3);
                     if (!tipo.equals("INT")) {
-                        JOptionPane.showMessageDialog(jt_fields, "El campo llave no puede ser diferente a int, se cambiara al tipo int");
+                        JOptionPane.showMessageDialog(jt_fields, "El campo llave no puede ser diferente a INT, se cambiará al tipo int");
                         tipo = "INT";
                     }
                     keys = 1;
@@ -815,7 +815,7 @@ public final class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_mi_modifyfieldActionPerformed
 
     private void jb_addfieldtotableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_addfieldtotableActionPerformed
-        DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel(); // modelo
+        DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel(); // Modelo
         DefaultComboBoxModel comboBoxModel = (DefaultComboBoxModel) cb_fields.getModel();
         String columnName = ((FieldDefinition) comboBoxModel.getSelectedItem()).getName(); // Nombre de la columna de la tabla.
         boolean exists = false; // Si el campo ya existe en la tabla.
@@ -834,15 +834,17 @@ public final class Principal extends javax.swing.JFrame {
 
             if (!exists) { // Si el campo no existe en la tabla...
                 tableModel.addColumn(((FieldDefinition) comboBoxModel.getSelectedItem()).getName()); // Agrega el campo a la tabla.
-                JOptionPane.showMessageDialog(this, "¡Campo agregado exitosamente a la tabla!");
             }
         }
+
+        JOptionPane.showMessageDialog(this, "¡Campo agregado exitosamente a la tabla!");
     }//GEN-LAST:event_jb_addfieldtotableActionPerformed
 
     private void jb_addrecordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_addrecordActionPerformed
         jb_addfieldtotable.setEnabled(false);
         DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
         Object[] newRow;
+        recordFields = new ArrayList();
 
         for (int i = 0; i < tableModel.getColumnCount(); i++) {
             String value = JOptionPane.showInputDialog("Ingrese " + tableModel.getColumnName(i).toLowerCase() + ": ");
@@ -856,15 +858,40 @@ public final class Principal extends javax.swing.JFrame {
                 tableModel.setValueAt(value, tableModel.getRowCount() - 1, i);
             }
         }
+
+        records.add(new Record(tableModel.getColumnCount(), recordFields));
     }//GEN-LAST:event_jb_addrecordActionPerformed
 
-    private void jm_fileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jm_fileActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jm_fileActionPerformed
+    private void mi_closefileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_closefileActionPerformed
+        jb_addfieldtotable.setEnabled(true);
+        records = new ArrayList();
+        fields = new ArrayList();
+        recordFields = new ArrayList();
 
-    /**
-     * @param args the command line arguments
-     */
+        DefaultTableModel recordsModel = (DefaultTableModel) jt_records.getModel();
+        DefaultTableModel fieldsModel = (DefaultTableModel) jt_fields.getModel();
+
+        jt_records.setModel(new DefaultTableModel());
+
+        System.out.println("numero de columnas de registros: " + recordsModel.getColumnCount());
+
+        int rows = fieldsModel.getRowCount();
+
+        for (int i = rows - 1; i >= 0; i--) {
+            fieldsModel.removeRow(i);
+        }
+
+        recordsModel.setColumnCount(0);
+    }//GEN-LAST:event_mi_closefileActionPerformed
+
+    private void mi_loadfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_loadfileActionPerformed
+        try {
+            loadAll();
+        } catch (IOException ex) {
+            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_mi_loadfileActionPerformed
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -929,14 +956,11 @@ public final class Principal extends javax.swing.JFrame {
             records.add(new Record(4, values));
         }
 
-        for (Record record : records) {
-            System.out.println(record.getFields());
-        }
-
         if (fileManager.newFile("PersonFile", fields)) {
             try {
-                System.out.println("Escribió en el archivo 1");
+               
                 fileManager.saveFile(records);
+                JOptionPane.showMessageDialog(this, "Archivo PersonFile Creado exitosamente");
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -971,48 +995,19 @@ public final class Principal extends javax.swing.JFrame {
         if (fileManager.newFile("CityFile", fields)) {
             try {
                 fileManager.saveFile(records);
-                System.out.println("Escribió en el archivo 2");
+                JOptionPane.showMessageDialog(this, "Archivo CityFile Creado exitosamente");
+
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        records = new ArrayList();
+        fields = new ArrayList();
+        
     }
 
-    public final void loadMetaPerson() throws FileNotFoundException, IOException {
-        File file = new File("META_PersonFile.txt");
-
-        if (file.exists()) {
-            FileReader fr = new FileReader(file);
-            BufferedReader buff_reader = new BufferedReader(fr);
-            String stringField = buff_reader.readLine();
-            fields = new ArrayList();
-            DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
-
-            StringTokenizer tokenField = new StringTokenizer(stringField, "|", false);
-
-            while (tokenField.hasMoreTokens()) {
-                StringTokenizer tokenVar = new StringTokenizer(tokenField.nextToken(), ":", false);
-                while (tokenVar.hasMoreTokens()) {
-                    String name = tokenVar.nextToken();
-                    int size = Integer.parseInt(tokenVar.nextToken());
-                    String type = tokenVar.nextToken();
-                    boolean key;
-                    if (tokenVar.nextToken().equals("true")) {
-                        key = true;
-                    } else {
-                        key = false;
-                    }
-
-                    fields.add(new FieldDefinition(name, type, size, key));
-                    System.out.println(fields.size());
-                    tableModel.addColumn(name);
-                }
-            }
-        }
-    }
-
-    public final void loadMetaCity() throws FileNotFoundException, IOException {
-        File file = new File("META_CityFile.txt");
+    public final void load(String path) throws FileNotFoundException, IOException {
+        File file = new File("META_" + path + ".txt");
 
         if (file.exists()) {
             FileReader fr = new FileReader(file);
@@ -1037,11 +1032,21 @@ public final class Principal extends javax.swing.JFrame {
                     }
 
                     fields.add(new FieldDefinition(name, type, size, key));
-                    System.out.println(fields.size());
                     tableModel.addColumn(name);
                 }
             }
         }
+    }
+
+    public void loadAll() throws IOException {
+        String path = JOptionPane.showInputDialog("Ingrese el nombre del archivo");
+        load(path);
+
+        fileManager.setFields(fields);
+        fileManager.loadRecords(path);
+        
+        refreshTable();
+        JOptionPane.showMessageDialog(this, "Archivo"+path+" Creado exitosamente");
     }
 
     public void refreshTable() {
@@ -1053,6 +1058,7 @@ public final class Principal extends javax.swing.JFrame {
 
         for (int i = 0; i < records.size(); i++) {
             model.addRow(records.get(i).getFields().toArray());
+            
         }
     }
 
@@ -1105,6 +1111,7 @@ public final class Principal extends javax.swing.JFrame {
     private javax.swing.JMenuItem mi_exportxml;
     private javax.swing.JMenuItem mi_fields;
     private javax.swing.JMenuItem mi_index;
+    private javax.swing.JMenuItem mi_loadfile;
     private javax.swing.JMenuItem mi_logout;
     private javax.swing.JMenuItem mi_modifyfield;
     private javax.swing.JMenuItem mi_newfile;
@@ -1122,4 +1129,5 @@ public final class Principal extends javax.swing.JFrame {
     FileManager fileCity = new FileManager();
     int FIELDS = 0;
     int keys = 1;
+    String fileName;
 }
