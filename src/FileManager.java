@@ -472,7 +472,6 @@ public class FileManager {
                         record.add(Float.toString(floated));
                         moveBytes += 4;
                     }
-                        System.out.println(record);
                 }
                 records.add(new Record(4, record));
                 randFile.close();

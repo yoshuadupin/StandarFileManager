@@ -18,18 +18,7 @@ public class Principal extends javax.swing.JFrame {
         this.pack();
         setLocationRelativeTo(null);
         this.setExtendedState(MAXIMIZED_BOTH);
-
-        int option;
-
-        do {
-            option = Integer.parseInt(JOptionPane.showInputDialog("¿Desea abrir PersonFile (1) o CityFile (2)?:"));
-        } while (option <= 0 || option >= 3);
-
-        if (option == 1) {
-            loadMetaPerson();
-        } else {
-            loadMetaCity();
-        }
+        loadMetaPerson();
     }
 
     @SuppressWarnings("unchecked")
@@ -583,16 +572,15 @@ public class Principal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void mi_newfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_newfileActionPerformed
-        createPersonFile();
+         createPersonFile();
 
         JOptionPane.showMessageDialog(this, "¡Creó el archivo de personas!");
 
-        createCityFile();
-
-        JOptionPane.showMessageDialog(this, "¡Creó el archivo de ciudades!");
-
+        //createCityFile();
+        //JOptionPane.showMessageDialog(this, "¡Creó el archivo de ciudades!");
         try {
             fileManager.loadRecords();
+            System.out.println("SIZE: " + records.size());
         } catch (IOException ex) {
             Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -669,6 +657,7 @@ public class Principal extends javax.swing.JFrame {
 
         cb_fields.setModel(model);
         cb_fields.updateUI();
+        refreshTable();
     }//GEN-LAST:event_mi_recordsActionPerformed
 
     private void mi_indexActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_indexActionPerformed
@@ -831,14 +820,12 @@ public class Principal extends javax.swing.JFrame {
 
     private void jb_addrecordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_addrecordActionPerformed
         jb_addfieldtotable.setEnabled(false);
-        ArrayList<String> fields = new ArrayList();
         DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
         Object[] newRow = null;
 
         for (int i = 0; i < tableModel.getColumnCount(); i++) {
             String value = JOptionPane.showInputDialog("Ingrese " + tableModel.getColumnName(i).toLowerCase() + ": ");
             newRow = new Object[]{value};
-            fields.add(value);
 
             if (i == 0) {
                 tableModel.addRow(newRow);
@@ -848,7 +835,6 @@ public class Principal extends javax.swing.JFrame {
                 tableModel.setValueAt(value, tableModel.getRowCount() - 1, i);
             }
         }
-        records.add(new Record(fields.size(),fields));
     }//GEN-LAST:event_jb_addrecordActionPerformed
 
     /**
@@ -891,6 +877,8 @@ public class Principal extends javax.swing.JFrame {
         String personId, personName, personAge, cityId;
         int randomName, randomLastName;
 
+        fields = new ArrayList();
+        records = new ArrayList();
         String[] names = {"Juan", "Diego", "Carlos", "Alejandra", "Diana", "Kimberly", "Miguel", "Mario", "Tania", "Luis", "Dinora", "Lucas", "Maria", "Jose", "Blanca", "Nicole", "Cristina", "Julio", "Cesar", "Berta", "Marcos", "Liliana", "Iris", "Katherine", "Christian", "Angel", "Andres", "Antonia", "Lesly", "Karina"};
         String[] lastNames = {"Murillo", "Umanzor", "Zuniga", "Perez", "Martinez", "Mendoza", "Dominguez", "Morales", "Lopez", "Garcia", "Espinoza", "Chavez", "Andino", "Trochez", "Gutierrez", "Medina", "Acosta", "Sanchez", "Canales", "Aguilera", "Padilla", "Ramos", "Cruz", "Aguilar", "Castillo", "Barahona", "Pineda", "Reyes", "Mejia", "Flores"};
 
@@ -979,7 +967,7 @@ public class Principal extends javax.swing.JFrame {
             FileReader fr = new FileReader(file);
             BufferedReader buff_reader = new BufferedReader(fr);
             String stringField = buff_reader.readLine();
-            fields = new ArrayList<>();
+            fields = new ArrayList();
             DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
 
             StringTokenizer tokenField = new StringTokenizer(stringField, "|", false);
@@ -1006,7 +994,7 @@ public class Principal extends javax.swing.JFrame {
     }
     
     public final void loadMetaCity() throws FileNotFoundException, IOException {
-        File file = new File("META_" + "CityFile" + ".txt");
+         File file = new File("META_" + "PersonFile" + ".txt");
 
         if (file.exists()) {
             FileReader fr = new FileReader(file);
@@ -1035,6 +1023,20 @@ public class Principal extends javax.swing.JFrame {
                     tableModel.addColumn(name);
                 }
             }
+        }
+    }
+    
+    public void refreshTable() {
+        DefaultTableModel model = (DefaultTableModel) jt_records.getModel();
+        
+        /*Object[] newRow = new Object[] {"Holis", "Adiosiwis", "Nel"};
+        model.addRow(os);*/
+        while(model.getRowCount() > 0) {
+            model.removeRow(0);
+        }
+        
+        for (int i = 0; i < records.size(); i++) {
+            model.addRow(records.get(i).getField().toArray());
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
