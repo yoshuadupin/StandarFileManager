@@ -640,6 +640,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Archivo"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jm_fileActionPerformed"/>
+              </Events>
               <SubComponents>
                 <MenuItem class="javax.swing.JMenuItem" name="mi_newfile">
                   <Properties>

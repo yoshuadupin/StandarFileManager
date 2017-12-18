@@ -471,6 +471,11 @@ public class Principal extends javax.swing.JFrame {
         jm_menu.setText("Menú");
 
         jm_file.setText("Archivo");
+        jm_file.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jm_fileActionPerformed(evt);
+            }
+        });
 
         mi_newfile.setText("Nuevo Archivo");
         mi_newfile.addActionListener(new java.awt.event.ActionListener() {
@@ -572,18 +577,16 @@ public class Principal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void mi_newfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_newfileActionPerformed
-         createPersonFile();
-         keys=1;
-        JOptionPane.showMessageDialog(this, "¡Creó el archivo de personas!");
 
-        //createCityFile();
-        //JOptionPane.showMessageDialog(this, "¡Creó el archivo de ciudades!");
-        try {
-            fileManager.loadRecords();
-            System.out.println("SIZE: " + records.size());
-        } catch (IOException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        ArrayList<FieldDefinition> fields = new ArrayList();
+        String name = JOptionPane.showInputDialog("Ingrese el nombre del archivo:");
+         fileManager.newFile(name,fields );
+         JOptionPane.showConfirmDialog(jPanel2, "!El archivo ha sido creado extiosamente!");
+        
+
+        
+       
+       
     }//GEN-LAST:event_mi_newfileActionPerformed
 
     private void mi_savefileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_savefileActionPerformed
@@ -867,6 +870,10 @@ public class Principal extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jb_addrecordActionPerformed
+
+    private void jm_fileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jm_fileActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jm_fileActionPerformed
 
     /**
      * @param args the command line arguments

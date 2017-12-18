@@ -69,13 +69,15 @@ public class FileManager {
                 String aux = "|";
                 fw = new FileWriter(metaFile);
                 buff_writer = new BufferedWriter(fw);
+                
+                if(!fields.isEmpty()){
                 for (FieldDefinition field : fields) {
                     aux += field.getName() + ":";
                     aux += field.getSize() + ":";
                     aux += field.getType() + ":";
                     aux += field.isKey() + "|";
                 }
-                //Escribe metadata para campos
+                                //Escribe metadata para campos
                 buff_writer.write(aux);
                 buff_writer.newLine();
                 //Escribe metadata para AvailList
@@ -90,6 +92,7 @@ public class FileManager {
                 buff_writer.write(Integer.toString(recordPerLine));
                 buff_writer.flush();
                 buff_writer.close();
+                }
 
                 return true;
 
