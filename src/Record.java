@@ -2,22 +2,22 @@ import java.util.ArrayList;
 
 public class Record {
 
-    private ArrayList<String> field = new ArrayList();
+    private ArrayList<String> fields = new ArrayList();
 
-    public Record(int size, ArrayList<String> field) {
-        this.field = field;
+    public Record(int size, ArrayList<String> fields) {
+        this.fields = fields;
     }
 
-    public ArrayList<String> getField() {
-        return field;
+    public ArrayList<String> getFields() {
+        return fields;
     }
 
     public void setField(String content) {
-        field.add(content);
+        fields.add(content);
     }
 
-    public void setField(ArrayList<String> field) {
-        this.field = field;
+    public void setFields(ArrayList<String> fields) {
+        this.fields = fields;
     }
 
 }

@@ -7,18 +7,39 @@ import java.io.IOException;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Principal extends javax.swing.JFrame {
+public final class Principal extends javax.swing.JFrame {
 
     public Principal() throws IOException {
         initComponents();
         this.pack();
         setLocationRelativeTo(null);
         this.setExtendedState(MAXIMIZED_BOTH);
-        loadMetaPerson();
+
+        int option;
+
+        option = Integer.parseInt(JOptionPane.showInputDialog("¿Cargar personas (1) o cargar ciudades (2)?"));
+
+        if (option == 1) { // Cargar personas.
+            loadMetaPerson();
+            fileManager.setFields(fields);
+            fileManager.loadRecords("PersonFile");
+            records = new ArrayList<>(fileManager.getRecords());
+            refreshTable();
+        } else if(option==2){ // Cargar ciudades.
+            loadMetaCity();
+            System.out.println(fields.size());
+            fileManager.setFields(fields);
+            fileManager.loadRecords("CityFile");
+            records = new ArrayList<>(fileManager.getRecords());
+            refreshTable();
+        }else{
+            
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -577,57 +598,24 @@ public class Principal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void mi_newfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_newfileActionPerformed
+        int option;
 
-        ArrayList<FieldDefinition> fields = new ArrayList();
-        String name = JOptionPane.showInputDialog("Ingrese el nombre del archivo:");
-         fileManager.newFile(name,fields );
-         JOptionPane.showConfirmDialog(jPanel2, "!El archivo ha sido creado extiosamente!");
-        
+        option = Integer.parseInt(JOptionPane.showInputDialog("¿Crear archivos de prueba (1) o crear archivo nuevo (2)?"));
 
-        
-       
-       
+        fields = new ArrayList();
+
+        if (option == 1) {
+            createPersonFile();
+            createCityFile();
+        } else {
+            String name = JOptionPane.showInputDialog("Ingrese el nombre del archivo:");
+            fileManager.newFile(name, fields);
+            JOptionPane.showMessageDialog(this, "!El archivo vacío ha sido creado exitosamente!");
+        }
     }//GEN-LAST:event_mi_newfileActionPerformed
 
     private void mi_savefileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_savefileActionPerformed
-        String aux1 = "Tegucigalpa";
-        String aux3 = "Ilich";
-        String aux4 = "García";
-        String aux5 = "ING";
 
-        recordFields.add("11611303");
-        recordFields.add("15");
-        recordFields.add(aux3);
-        recordFields.add(aux4);
-        recordFields.add(aux5);
-
-        fields.add(new FieldDefinition("ID", "INT", 20, true));
-        fields.add(new FieldDefinition(aux1, "CHAR", 20, false));
-        fields.add(new FieldDefinition(aux3, "CHAR", 20, false));
-        fields.add(new FieldDefinition(aux4, "CHAR", 20, false));
-        fields.add(new FieldDefinition(aux5, "CHAR", 20, false));
-
-        for (int i = 0; i < 2500; i++) {
-            records.add(new Record(15, recordFields));
-        }
-
-        if (fileManager.newFile("PersonFile", fields)) {
-            System.out.println("Escribió en el archivo");
-
-            try {
-                fileManager.saveFile(records);
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            try {
-                fileManager.loadFile("PersonFile");
-            } catch (IOException ex) {
-                Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        JOptionPane.showMessageDialog(this, "Archivo guardado correctamente");
     }//GEN-LAST:event_mi_savefileActionPerformed
 
     private void mi_logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_logoutActionPerformed
@@ -728,11 +716,11 @@ public class Principal extends javax.swing.JFrame {
     private void mi_deletefieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_deletefieldActionPerformed
         DefaultTableModel model = (DefaultTableModel) jt_fields.getModel();
         DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
-        recordFields.clear();
+        recordFields = new ArrayList();
 
         if (jt_fields.getSelectedRow() >= 0) {
             for (int i = 0; i < records.size(); i++) {
-                records.get(i).getField().remove(jt_fields.getSelectedRow());
+                records.get(i).getFields().remove(jt_fields.getSelectedRow());
             }
 
             fields.remove(jt_fields.getSelectedRow());
@@ -745,8 +733,7 @@ public class Principal extends javax.swing.JFrame {
                 jt_records.setModel(tableModel);
             }
             tableModel.setColumnCount(0);
-            
-            
+
             //Creando tabla actualizada
             for (int i = 0; i < fields.size(); i++) {
                 tableModel.addColumn(fields.get(i).getName()); // Agrega el campo a la tabla.
@@ -754,8 +741,8 @@ public class Principal extends javax.swing.JFrame {
             }
 
             for (int i = 0; i < records.size(); i++) {
-                for (int j = 0; j < records.get(i).getField().size(); j++) {
-                    String value = records.get(i).getField().get(j);
+                for (int j = 0; j < records.get(i).getFields().size(); j++) {
+                    String value = records.get(i).getFields().get(j);
                     Object[] newRow = new Object[]{value};
                     if (j == 0) {
                         tableModel.addRow(newRow);
@@ -796,7 +783,7 @@ public class Principal extends javax.swing.JFrame {
                 } else {
                     key = true;
                     model.setValueAt("true", jt_fields.getSelectedRow(), 3);
-                    if (tipo != "INT") {
+                    if (!tipo.equals("INT")) {
                         JOptionPane.showMessageDialog(jt_fields, "El campo llave no puede ser diferente a int, se cambiara al tipo int");
                         tipo = "INT";
                     }
@@ -855,7 +842,7 @@ public class Principal extends javax.swing.JFrame {
     private void jb_addrecordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_addrecordActionPerformed
         jb_addfieldtotable.setEnabled(false);
         DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
-        Object[] newRow = null;
+        Object[] newRow;
 
         for (int i = 0; i < tableModel.getColumnCount(); i++) {
             String value = JOptionPane.showInputDialog("Ingrese " + tableModel.getColumnName(i).toLowerCase() + ": ");
@@ -943,16 +930,10 @@ public class Principal extends javax.swing.JFrame {
         }
 
         for (Record record : records) {
-            System.out.println(record.getField());
+            System.out.println(record.getFields());
         }
 
         if (fileManager.newFile("PersonFile", fields)) {
-            try {
-                fileManager.loadFile("PersonFile");
-            } catch (IOException ex) {
-                Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
             try {
                 System.out.println("Escribió en el archivo 1");
                 fileManager.saveFile(records);
@@ -988,7 +969,6 @@ public class Principal extends javax.swing.JFrame {
         }
 
         if (fileManager.newFile("CityFile", fields)) {
-
             try {
                 fileManager.saveFile(records);
                 System.out.println("Escribió en el archivo 2");
@@ -999,7 +979,7 @@ public class Principal extends javax.swing.JFrame {
     }
 
     public final void loadMetaPerson() throws FileNotFoundException, IOException {
-        File file = new File("META_" + "PersonFile" + ".txt");
+        File file = new File("META_PersonFile.txt");
 
         if (file.exists()) {
             FileReader fr = new FileReader(file);
@@ -1030,9 +1010,9 @@ public class Principal extends javax.swing.JFrame {
             }
         }
     }
-    
+
     public final void loadMetaCity() throws FileNotFoundException, IOException {
-         File file = new File("META_" + "PersonFile" + ".txt");
+        File file = new File("META_CityFile.txt");
 
         if (file.exists()) {
             FileReader fr = new FileReader(file);
@@ -1063,20 +1043,19 @@ public class Principal extends javax.swing.JFrame {
             }
         }
     }
-    
+
     public void refreshTable() {
         DefaultTableModel model = (DefaultTableModel) jt_records.getModel();
-        
-        /*Object[] newRow = new Object[] {"Holis", "Adiosiwis", "Nel"};
-        model.addRow(os);*/
-        while(model.getRowCount() > 0) {
+
+        while (model.getRowCount() > 0) {
             model.removeRow(0);
         }
-        
+
         for (int i = 0; i < records.size(); i++) {
-            model.addRow(records.get(i).getField().toArray());
+            model.addRow(records.get(i).getFields().toArray());
         }
     }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> cb_fieldkey;
     private javax.swing.JComboBox<String> cb_fields;

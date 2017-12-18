@@ -50,6 +50,22 @@ public class FileManager {
         records = new LinkedList<>();
     }
 
+    public ArrayList<FieldDefinition> getFields() {
+        return fields;
+    }
+
+    public void setFields(ArrayList<FieldDefinition> fields) {
+        this.fields = fields;
+    }
+
+    public LinkedList<Record> getRecords() {
+        return records;
+    }
+
+    public void setRecords(LinkedList<Record> records) {
+        this.records = records;
+    }
+
     //Crea un nuevo archivo con el nombre.
     public boolean newFile(String pathname, ArrayList<FieldDefinition> fields) {
         File metaFile = new File("META_" + pathname + ".txt");
@@ -69,29 +85,29 @@ public class FileManager {
                 String aux = "|";
                 fw = new FileWriter(metaFile);
                 buff_writer = new BufferedWriter(fw);
-                
-                if(!fields.isEmpty()){
-                for (FieldDefinition field : fields) {
-                    aux += field.getName() + ":";
-                    aux += field.getSize() + ":";
-                    aux += field.getType() + ":";
-                    aux += field.isKey() + "|";
-                }
-                                //Escribe metadata para campos
-                buff_writer.write(aux);
-                buff_writer.newLine();
-                //Escribe metadata para AvailList
-                aux = Integer.toString(availList_offset);
-                buff_writer.write(aux);
-                //Escribe metadata para buscar el final de archivo y hacer  append
-                buff_writer.newLine();
-                offset_final = 0;
-                recordPerLine = offset_final;
-                buff_writer.write(Integer.toString(offset_final));
-                buff_writer.newLine();
-                buff_writer.write(Integer.toString(recordPerLine));
-                buff_writer.flush();
-                buff_writer.close();
+
+                if (!fields.isEmpty()) {
+                    for (FieldDefinition field : fields) {
+                        aux += field.getName() + ":";
+                        aux += field.getSize() + ":";
+                        aux += field.getType() + ":";
+                        aux += field.isKey() + "|";
+                    }
+                    //Escribe metadata para campos
+                    buff_writer.write(aux);
+                    buff_writer.newLine();
+                    //Escribe metadata para AvailList
+                    aux = Integer.toString(availList_offset);
+                    buff_writer.write(aux);
+                    //Escribe metadata para buscar el final de archivo y hacer  append
+                    buff_writer.newLine();
+                    offset_final = 0;
+                    recordPerLine = offset_final;
+                    buff_writer.write(Integer.toString(offset_final));
+                    buff_writer.newLine();
+                    buff_writer.write(Integer.toString(recordPerLine));
+                    buff_writer.flush();
+                    buff_writer.close();
                 }
 
                 return true;
@@ -234,79 +250,82 @@ public class FileManager {
                         }
                         //!!!!TERMINA CONVERSION DE TIPO//////
                     } else //Si cambia solo el tamano
-                    if (newFields.get(i).getType().equals("CHAR")) {
+                    {
+                        if (newFields.get(i).getType().equals("CHAR")) {
 
-                        if (newFields.get(i).getSize() < fields.get(i).getSize()) {
-                            for (int j = 0; j < newFields.get(i).getSize(); j++) {
-                                moveBW++;
-                                moveBR++;
-                                buffWrite[moveBW] = buffRead[moveBR];
+                            if (newFields.get(i).getSize() < fields.get(i).getSize()) {
+                                for (int j = 0; j < newFields.get(i).getSize(); j++) {
+                                    moveBW++;
+                                    moveBR++;
+                                    buffWrite[moveBW] = buffRead[moveBR];
+
+                                }
+                                moveBR += fields.get(i).getSize() - newFields.get(i).getSize();
+
+                            } else {
+                                //Hay que rellenar el espacio 
+                                System.out.println("Cambia tamano");
+                                String aux = "";
+                                for (int j = 0; j < newFields.get(i).getSize() - fields.get(i).getSize(); j++) {
+                                    aux += "*";
+                                }
+                                System.out.println(aux);
+                                byte[] temp = stringToByte(aux);
+                                System.out.println(temp.length);
+                                System.out.println(fields.get(i).getSize());
+                                //Copiar en el buffWrite
+                                for (int j = 0; j < fields.get(i).getSize(); j++) {
+                                    moveBW++;
+                                    moveBR++;
+                                    buffWrite[moveBW] = buffRead[moveBR];
+
+                                }
+                                for (int j = 0; j < temp.length; j++) {
+                                    moveBW++;
+                                    buffWrite[moveBW] = temp[j];
+
+                                }
+                                moveBR += fields.get(i).getSize();
 
                             }
-                            moveBR += fields.get(i).getSize() - newFields.get(i).getSize();
 
-                        } else {
-                            //Hay que rellenar el espacio 
-                            System.out.println("Cambia tamano");
-                            String aux = "";
-                            for (int j = 0; j < newFields.get(i).getSize() - fields.get(i).getSize(); j++) {
-                                aux += "*";
-                            }
-                            System.out.println(aux);
-                            byte[] temp = stringToByte(aux);
-                            System.out.println(temp.length);
-                            System.out.println(fields.get(i).getSize());
-                            //Copiar en el buffWrite
-                            for (int j = 0; j < fields.get(i).getSize(); j++) {
-                                moveBW++;
-                                moveBR++;
-                                buffWrite[moveBW] = buffRead[moveBR];
-
-                            }
+                        } else if (newFields.get(i).getType().equals("INT")) {
+                            //VALOR POR DEFECTO
+                            byte[] temp = toByteArray(0);
                             for (int j = 0; j < temp.length; j++) {
                                 moveBW++;
                                 buffWrite[moveBW] = temp[j];
-
                             }
-                            moveBR += fields.get(i).getSize();
-
-                        }
-
-                    } else if (newFields.get(i).getType().equals("INT")) {
-                        //VALOR POR DEFECTO
-                        byte[] temp = toByteArray(0);
-                        for (int j = 0; j < temp.length; j++) {
-                            moveBW++;
-                            buffWrite[moveBW] = temp[j];
-                        }
-                        moveBR += 4;
-                    } else if (newFields.get(i).getType().equals("FLOAT")) {
-                        byte[] temp = float2ByteArray((float) 0.0);
-                        for (int j = 0; j < temp.length; j++) {
-                            moveBW++;
-                            buffWrite[moveBW] = temp[j];
-                        }
-                        moveBR += 4;
-                    } //Se mueve en el BR;
-
+                            moveBR += 4;
+                        } else if (newFields.get(i).getType().equals("FLOAT")) {
+                            byte[] temp = float2ByteArray((float) 0.0);
+                            for (int j = 0; j < temp.length; j++) {
+                                moveBW++;
+                                buffWrite[moveBW] = temp[j];
+                            }
+                            moveBR += 4;
+                        } //Se mueve en el BR;
+                    }
                 } else //Si son iguales solo copiara la informacion
-                if (newFields.get(i).getType().equals("CHAR")) {
-                    for (int j = 0; j < newFields.get(i).getSize(); j++) {
-                        moveBW++;
-                        moveBR++;
-                        buffWrite[moveBW] = buffRead[moveBR];
-                    }
-                } else if (newFields.get(i).getType().equals("INT")) {
-                    for (int j = 0; j < 4; j++) {
-                        moveBW++;
-                        moveBR++;
-                        buffWrite[moveBW] = buffRead[moveBR];
-                    }
-                } else if (newFields.get(i).getType().equals("FLOAT")) {
-                    for (int j = 0; j < 4; j++) {
-                        moveBW++;
-                        moveBR++;
-                        buffWrite[moveBW] = buffRead[moveBR];
+                {
+                    if (newFields.get(i).getType().equals("CHAR")) {
+                        for (int j = 0; j < newFields.get(i).getSize(); j++) {
+                            moveBW++;
+                            moveBR++;
+                            buffWrite[moveBW] = buffRead[moveBR];
+                        }
+                    } else if (newFields.get(i).getType().equals("INT")) {
+                        for (int j = 0; j < 4; j++) {
+                            moveBW++;
+                            moveBR++;
+                            buffWrite[moveBW] = buffRead[moveBR];
+                        }
+                    } else if (newFields.get(i).getType().equals("FLOAT")) {
+                        for (int j = 0; j < 4; j++) {
+                            moveBW++;
+                            moveBR++;
+                            buffWrite[moveBW] = buffRead[moveBR];
+                        }
                     }
                 }
 
@@ -386,10 +405,10 @@ public class FileManager {
                 int cont = 0;
                 //GUARDA AL FINAL DEL ARCHIVO
                 for (int i = 0; i < records.size(); i++) {
-                    for (int j = 0; j < records.get(i).getField().size(); j++) {
+                    for (int j = 0; j < records.get(i).getFields().size(); j++) {
                         if (fields.get(j).isKey()) {
                             //Escribe Llave
-                            indexFile.writeInt(Integer.parseInt(records.get(i).getField().get(j)));
+                            indexFile.writeInt(Integer.parseInt(records.get(i).getFields().get(j)));
                             //Escribe RRN
                             //USA 8 bytes en vez de 4
                             indexFile.writeLong(indexFile.length());
@@ -397,7 +416,7 @@ public class FileManager {
                         }
                         if (fields.get(j).getType().equals("CHAR")) {
                             //El numero de caracteres UNICODE y 4 bytes
-                            String aux = records.get(i).getField().get(j);
+                            String aux = records.get(i).getFields().get(j);
                             int size = aux.length();
                             for (int k = 0; k < fields.get(j).getSize() - size; k++) {
                                 aux += "*";
@@ -410,13 +429,13 @@ public class FileManager {
                                 cont++;
                             }
                         } else if (fields.get(j).getType().equals("INT")) {
-                            byte[] temp = toByteArray(new Integer(records.get(i).getField().get(j)));
+                            byte[] temp = toByteArray(new Integer(records.get(i).getFields().get(j)));
                             for (int k = 0; k < temp.length; k++) {
                                 buff[cont] = temp[k];
                                 cont++;
                             }
                         } else if (fields.get(j).getType().equals("FLOAT")) {
-                            byte[] temp = float2ByteArray(new Float(records.get(i).getField().get(j)));
+                            byte[] temp = float2ByteArray(new Float(records.get(i).getFields().get(j)));
                             for (int k = 0; k < temp.length; k++) {
                                 buff[cont] = temp[k];
                                 cont++;
@@ -437,7 +456,9 @@ public class FileManager {
 
     }
 
-    public boolean loadRecords() throws IOException {
+    public boolean loadRecords(String pathName) throws IOException {
+        this.file = new File(pathName);
+
         if (file.exists()) {
             try {
                 RandomAccessFile randFile = new RandomAccessFile(file, "r");
@@ -448,42 +469,43 @@ public class FileManager {
                 randFile.readFully(buffFile);
                 int cont = 0;
                 int moveBytes = 0;
-                ArrayList<String> record = new ArrayList<>();
-                records.clear();
-                
+                ArrayList<String> values = new ArrayList<>();
+
                 for (int i = 0; cont < cantRecord * fields.size(); i++) {
                     if (fields.size() == i) {
                         i = 0;
-                        records.add(new Record(4, record));
-                        record.clear();
+                        records.add(new Record(4, values));
+                        values = new ArrayList();
                     }
+                    
                     cont++;
 
                     if (fields.get(i).getType().equals("CHAR")) {
                         byte[] field = subArray(buffFile, moveBytes, fields.get(i).getSize());
                         String st = byteToString(field);
-                        record.add(st);
+                        values.add(st);
                         moveBytes += fields.get(i).getSize();
                     } else if (fields.get(i).getType().equals("INT")) {
                         byte[] field = subArray(buffFile, moveBytes, 4);
                         int integer = fromByteArray(field);
-                        record.add(Integer.toString(integer));
+                        values.add(Integer.toString(integer));
                         moveBytes += 4;
                     } else if (fields.get(i).getType().equals("FLOAT")) {
                         byte[] field = subArray(buffFile, moveBytes, 4);
                         float floated = convertToFloat(field);
-                        record.add(Float.toString(floated));
+                        values.add(Float.toString(floated));
                         moveBytes += 4;
                     }
                 }
-                records.add(new Record(4, record));
+                
+                records.add(new Record(4, values)); // Revisar el 4.
                 randFile.close();
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         }
-        
+
         return false;
 
     }
@@ -504,8 +526,8 @@ public class FileManager {
         patron += "|";
         for (int i = 0; i < fields.size(); i++) {
 
-            patron += record.getField().get(i);
-            for (int j = 0; j < fields.get(i).getSize() - record.getField().get(i).length(); j++) {
+            patron += record.getFields().get(i);
+            for (int j = 0; j < fields.get(i).getSize() - record.getFields().get(i).length(); j++) {
                 patron += "*";
             }
             patron += "|";
