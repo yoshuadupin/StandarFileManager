@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package arbol_b;
 
 import java.util.Collection;
@@ -10,13 +5,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 
-/**
- *
- * @author Diego
- */
 public class Pagina {
 
     Pagina padre;
+   
+    LinkedList<Long> rrn;
     LinkedList<Integer> llaves;
     LinkedList<Pagina> hijos;
 
@@ -24,7 +17,17 @@ public class Pagina {
         padre = null;
         llaves = new LinkedList<>();
         hijos = new LinkedList<>();
+        rrn  = new LinkedList<>();
     }
+
+    public LinkedList<Long> getRrn() {
+        return rrn;
+    }
+
+    public void setRrn(LinkedList<Long> rrn) {
+        this.rrn = rrn;
+    }
+        
 
     public LinkedList<Integer> getLlaves() {
         return llaves;
