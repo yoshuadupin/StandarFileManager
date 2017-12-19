@@ -1,15 +1,31 @@
 
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
 
 public final class Principal extends javax.swing.JFrame {
 
@@ -698,9 +714,79 @@ public final class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_mi_exportexcelActionPerformed
 
     private void mi_exportxmlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_exportxmlActionPerformed
+        Struct_XML();
         JOptionPane.showMessageDialog(this, "¡XML exportado exitosamente con Schema!");
     }//GEN-LAST:event_mi_exportxmlActionPerformed
+    public void Struct_XML() {
+        Document document = null;
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            DOMImplementation implementation = builder.getDOMImplementation();
+            document = implementation.createDocument(null, "xml", null);
+             //Arraylist de campos
 
+
+            for (int i = 0; i < records.size(); i++) {
+
+                Element registro = document.createElement("Registro"+i);               
+                document.getDocumentElement().appendChild(registro);
+                ArrayList<Element> elementos = new ArrayList();
+                
+                for (int j = 0; j < records.get(0).getFields().size(); j++) { //Llenando arraylist de elementos campos
+                Element campos = document.createElement(fields.get(j).getName());
+                elementos.add(campos);
+            }
+
+                for (int h = 0; h < elementos.size(); h++) {
+                    registro.appendChild(elementos.get(h));
+                    Text valorCampo = document.createTextNode(records.get(i).getFields().get(h));
+                    elementos.get(h).appendChild(valorCampo);
+                    document.setXmlVersion("1.0");
+                  
+                }
+
+            }
+
+            
+
+        } catch (Exception e) {
+            System.err.println("Error");
+        }
+        String name = JOptionPane.showInputDialog("Ingrese el nombre del archivo que desea guadar: ");
+        Guardar_XML(document,name);
+        
+    }
+
+    public void Guardar_XML(Document document, String URI) {
+        try {
+            TransformerFactory transFact = TransformerFactory.newInstance();
+
+            transFact.setAttribute("indent-number", new Integer(3));
+            Transformer trans = transFact.newTransformer();
+            trans.setOutputProperty(OutputKeys.INDENT, "yes");
+            trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+
+            StringWriter sw = new StringWriter();
+            StreamResult sr = new StreamResult(sw);
+            DOMSource domSource = new DOMSource(document);
+            trans.transform(domSource, sr);
+
+            try {
+                //Creamos fichero para escribir en modo texto
+                PrintWriter writer = new PrintWriter(new FileWriter(URI+".xml"));
+                System.out.println(records.size());
+                //Escribimos todo el árbol en el fichero
+                writer.println(sw.toString());
+
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
     private void jb_addfieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_addfieldActionPerformed
         String name, type;
         int size;
