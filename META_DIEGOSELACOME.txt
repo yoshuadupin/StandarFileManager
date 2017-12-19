@@ -1,3 +1,0 @@
-|ID:8:INT:true|Nombre:50:CHAR:false|
--1
--1
