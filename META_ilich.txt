@@ -1,4 +1,0 @@
-|id:2:INT:false|cedula:2:INT:true|
--1
-0
-0

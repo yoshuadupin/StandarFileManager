@@ -586,31 +586,42 @@ public final class Principal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void mi_newfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_newfileActionPerformed
-        int option;
+        if (cont == 0) {
+            int option;
 
-        option = Integer.parseInt(JOptionPane.showInputDialog("¿Crear archivos de prueba (1) o crear archivo nuevo (2)?"));
+            option = Integer.parseInt(JOptionPane.showInputDialog("¿Crear archivos de prueba (1) o crear archivo nuevo (2)?"));
 
-        fields = new ArrayList();
+            fields = new ArrayList();
 
-        if (option == 1) {
-            createPersonFile();
-            createCityFile();
-            
+            if (option == 1) {
+                createPersonFile();
+                createCityFile();
+
+            } else {
+                fileName = JOptionPane.showInputDialog("Ingrese el nombre del archivo");
+            }
+            cont++;
+
         } else {
-            fileName = JOptionPane.showInputDialog("Ingrese el nombre del archivo");
+            JOptionPane.showMessageDialog(this, "hay un archivo abierto cierrelo antes");
         }
     }//GEN-LAST:event_mi_newfileActionPerformed
 
     private void mi_savefileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_savefileActionPerformed
-        if (fileManager.newFile(fileName, fields)) {
-            try {
-                fileManager.saveFile(records);
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+        if (records.size() > 0 && fields.size() > 0) {
+
+            if (fileManager.newFile(fileName, fields)) {
+                try {
+                    fileManager.saveFile(records);
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+            JOptionPane.showMessageDialog(this, "!El archivo vacío ha sido creado exitosamente!");
+        } else {
+            JOptionPane.showMessageDialog(this, "Cree registros primero");
         }
 
-        JOptionPane.showMessageDialog(this, "!El archivo vacío ha sido creado exitosamente!");
     }//GEN-LAST:event_mi_savefileActionPerformed
 
     private void mi_logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_logoutActionPerformed
@@ -845,9 +856,25 @@ public final class Principal extends javax.swing.JFrame {
         DefaultTableModel tableModel = (DefaultTableModel) jt_records.getModel();
         Object[] newRow;
         recordFields = new ArrayList();
+        boolean isValid = false;
 
         for (int i = 0; i < tableModel.getColumnCount(); i++) {
+            String type = fields.get(i).getType();
             String value = JOptionPane.showInputDialog("Ingrese " + tableModel.getColumnName(i).toLowerCase() + ": ");
+
+            if (type.equals("INT")) {
+                isValid = isValidInt(value);
+
+            } else if (type.equals("FLOAT")) {
+                isValid = isValidFloat(value);
+
+            }
+
+            if (!isValid) {
+                JOptionPane.showMessageDialog(this, "Se insertaron espacios en blanco por valores inválidos");
+                value = "";
+            }
+
             newRow = new Object[]{value};
 
             if (i == 0) {
@@ -882,6 +909,8 @@ public final class Principal extends javax.swing.JFrame {
         }
 
         recordsModel.setColumnCount(0);
+        cont = 0;
+        JOptionPane.showMessageDialog(this, "Archivo cerrado exitosamente");
     }//GEN-LAST:event_mi_closefileActionPerformed
 
     private void mi_loadfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_loadfileActionPerformed
@@ -958,7 +987,7 @@ public final class Principal extends javax.swing.JFrame {
 
         if (fileManager.newFile("PersonFile", fields)) {
             try {
-               
+
                 fileManager.saveFile(records);
                 JOptionPane.showMessageDialog(this, "Archivo PersonFile Creado exitosamente");
             } catch (FileNotFoundException ex) {
@@ -993,6 +1022,9 @@ public final class Principal extends javax.swing.JFrame {
         }
 
         if (fileManager.newFile("CityFile", fields)) {
+            System.out.println(fields.size());
+            System.out.println(records.size());
+
             try {
                 fileManager.saveFile(records);
                 JOptionPane.showMessageDialog(this, "Archivo CityFile Creado exitosamente");
@@ -1003,7 +1035,7 @@ public final class Principal extends javax.swing.JFrame {
         }
         records = new ArrayList();
         fields = new ArrayList();
-        
+
     }
 
     public final void load(String path) throws FileNotFoundException, IOException {
@@ -1044,9 +1076,9 @@ public final class Principal extends javax.swing.JFrame {
 
         fileManager.setFields(fields);
         fileManager.loadRecords(path);
-        
+
         refreshTable();
-        JOptionPane.showMessageDialog(this, "Archivo"+path+" Creado exitosamente");
+        JOptionPane.showMessageDialog(this, "Archivo" + path + " Creado exitosamente");
     }
 
     public void refreshTable() {
@@ -1058,8 +1090,32 @@ public final class Principal extends javax.swing.JFrame {
 
         for (int i = 0; i < records.size(); i++) {
             model.addRow(records.get(i).getFields().toArray());
-            
+
         }
+    }
+
+    public boolean isValidInt(String value) {
+        boolean isValid = true;
+
+        try {
+            Integer.parseInt(value);
+        } catch (NumberFormatException nfe) {
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    public boolean isValidFloat(String value) {
+        boolean isValid = true;
+
+        try {
+            Float.parseFloat(value);
+        } catch (NumberFormatException nfe) {
+            isValid = false;
+        }
+
+        return isValid;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1129,5 +1185,6 @@ public final class Principal extends javax.swing.JFrame {
     FileManager fileCity = new FileManager();
     int FIELDS = 0;
     int keys = 1;
+    int cont = 0;
     String fileName;
 }

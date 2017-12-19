@@ -1,4 +1,0 @@
-|PersonId:6:INT:true|PersonName:30:CHAR:false|PersonAge:3:INT:false|CityId:4:INT:false|
--1
-0
-0

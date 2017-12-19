@@ -1,4 +1,0 @@
-|CityId:4:INT:true|CityName:30:CHAR:false|
--1
-0
-0
